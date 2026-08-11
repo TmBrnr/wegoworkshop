@@ -21,7 +21,7 @@
     'step-review': 'booking-review.html',
     'step-payment': 'booking-payment.html'
   };
-  var ACTIVE_CLASSES = ['active', 'bg-orange-100', 'text-primary-700'];
+  var ACTIVE_CLASSES = ['active', 'bg-primary-100', 'text-primary-700'];
   var INACTIVE_CLASSES = ['text-gray-500'];
 
   function setLinkActiveState(link, isActive) {

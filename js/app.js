@@ -21,7 +21,7 @@
     var base = 'seat h-9 w-9 rounded border text-xs font-semibold transition ';
     if (isOccupied) return base + 'cursor-not-allowed border-gray-300 bg-gray-200 text-gray-500';
     if (isSelected) return base + 'border-primary-600 bg-primary-600 text-white';
-    return base + 'border-gray-300 bg-white text-gray-700 hover:border-primary-600 hover:bg-orange-50';
+    return base + 'border-gray-300 bg-white text-gray-700 hover:border-primary-600 hover:bg-primary-50';
   }
 
   function showView(viewId) {
@@ -167,7 +167,7 @@
           var selected = selectedBaggage === id;
           card.classList.toggle('selected', selected);
           card.classList.toggle('border-primary-600', selected);
-          card.classList.toggle('bg-orange-50', selected);
+          card.classList.toggle('bg-primary-50', selected);
           card.classList.toggle('border-gray-200', !selected);
           card.classList.toggle('bg-white', !selected);
           var btn = card.querySelector('.select-baggage');
@@ -177,7 +177,7 @@
       }
       BAGGAGE_OPTIONS.forEach(function (opt) {
         var card = document.createElement('div');
-        card.className = 'baggage-card rounded-lg border p-4 shadow-sm ' + (selectedBaggage === opt.id ? 'selected border-primary-600 bg-orange-50' : 'border-gray-200 bg-white');
+        card.className = 'baggage-card rounded-lg border p-4 shadow-sm ' + (selectedBaggage === opt.id ? 'selected border-primary-600 bg-primary-50' : 'border-gray-200 bg-white');
         card.innerHTML = '<h3 class="mb-3 text-lg font-semibold text-gray-900">' + opt.name + '</h3><ul class="mb-4 list-disc space-y-1 pl-4 text-sm text-gray-600"><li>1 x ' + opt.checkIn.split(' ').slice(1).join(' ') + ' check-in</li><li>1 x ' + opt.carryOn.split(' ').slice(1).join(' ') + ' carry-on</li><li>Cancel Fee: $' + opt.cancelFee + '</li>' + (opt.freeChanges ? '<li>' + opt.freeChanges + ' x Free Change</li>' : '') + '<li>Change Fee: $' + opt.changeFee + '</li></ul><button type="button" class="' + (selectedBaggage === opt.id ? BTN_SECONDARY : BTN_PRIMARY) + ' select-baggage w-full" data-id="' + opt.id + '">' + (selectedBaggage === opt.id ? 'SELECTED' : 'SELECT') + '</button>';
         card.querySelector('.select-baggage').addEventListener('click', function () {
           selectedBaggage = opt.id;
@@ -280,7 +280,7 @@
           var selected = selectedMeal === id;
           card.classList.toggle('selected', selected);
           card.classList.toggle('border-primary-600', selected);
-          card.classList.toggle('bg-orange-50', selected);
+          card.classList.toggle('bg-primary-50', selected);
           card.classList.toggle('border-gray-200', !selected);
           card.classList.toggle('bg-white', !selected);
           var btn = card.querySelector('.select-meal');
@@ -290,7 +290,7 @@
       }
       MEAL_OPTIONS.forEach(function (opt) {
         var card = document.createElement('div');
-        card.className = 'meal-card rounded-lg border p-4 text-center shadow-sm ' + (selectedMeal === opt.id ? 'selected border-primary-600 bg-orange-50' : 'border-gray-200 bg-white');
+        card.className = 'meal-card rounded-lg border p-4 text-center shadow-sm ' + (selectedMeal === opt.id ? 'selected border-primary-600 bg-primary-50' : 'border-gray-200 bg-white');
         card.innerHTML = '<h3 class="mb-2 text-base font-semibold text-gray-900">' + opt.name + '</h3><div class="meal-image mb-3 rounded-lg bg-gray-50 p-4 text-sm text-gray-600" role="img" aria-label="Meal"><i class="' + opt.icon + '"></i><br> ' + opt.description + '</div><div class="meal-body"><button type="button" class="' + (selectedMeal === opt.id ? BTN_SECONDARY : BTN_PRIMARY) + ' select-meal w-full" data-id="' + opt.id + '">' + (selectedMeal === opt.id ? 'SELECTED' : 'SELECT') + '</button></div>';
         card.querySelector('.select-meal').addEventListener('click', function () {
           selectedMeal = opt.id;
@@ -315,7 +315,7 @@
       ANCILLARY_OPTIONS.forEach(function (opt) {
         var isSelected = selectedAncillaries.indexOf(opt.id) !== -1;
         var card = document.createElement('div');
-        card.className = 'ancillary-card rounded-lg border p-4 text-center shadow-sm ' + (isSelected ? 'selected border-primary-600 bg-orange-50' : 'border-gray-200 bg-white');
+        card.className = 'ancillary-card rounded-lg border p-4 text-center shadow-sm ' + (isSelected ? 'selected border-primary-600 bg-primary-50' : 'border-gray-200 bg-white');
         card.innerHTML = '<div class="ancillary-image mb-3 rounded-lg bg-gray-50 p-4 text-sm text-gray-600" role="img" aria-label="Option"><i class="' + opt.icon + '"></i><br>' + opt.description + '</div><div class="ancillary-body"><h3 class="mb-2 text-base font-semibold text-gray-900">' + opt.name + '</h3><button type="button" class="' + (isSelected ? BTN_SECONDARY : BTN_PRIMARY) + ' toggle-ancillary w-full" data-id="' + opt.id + '">' + (isSelected ? 'SELECTED' : 'SELECT') + '</button></div>';
         card.querySelector('.toggle-ancillary').addEventListener('click', function () {
           var idx = selectedAncillaries.indexOf(opt.id);
@@ -325,7 +325,7 @@
           var selected = selectedAncillaries.indexOf(opt.id) !== -1;
           card.classList.toggle('selected', selected);
           card.classList.toggle('border-primary-600', selected);
-          card.classList.toggle('bg-orange-50', selected);
+          card.classList.toggle('bg-primary-50', selected);
           card.classList.toggle('border-gray-200', !selected);
           card.classList.toggle('bg-white', !selected);
           var btn = card.querySelector('.toggle-ancillary');

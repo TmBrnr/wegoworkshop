@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wego Workshop – Flights, Hotels &amp; Car Rentals</title>
+  <title>Wego Workshop – Low Fare Flights Across Asia</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -11,16 +11,16 @@
         extend: {
           colors: {
             primary: {
-              50: "#fff7ed",
-              100: "#ffedd5",
-              200: "#fed7aa",
-              300: "#fdba74",
-              400: "#fb923c",
-              500: "#f97316",
-              600: "#e85d04",
-              700: "#d45303",
-              800: "#9a3412",
-              900: "#7c2d12"
+              50: "#edf8ff",
+              100: "#d6efff",
+              200: "#addfff",
+              300: "#73c9ff",
+              400: "#32abf5",
+              500: "#078cda",
+              600: "#006eb4",
+              700: "#07598f",
+              800: "#0b4b76",
+              900: "#093f64"
             }
           }
         }
@@ -37,71 +37,46 @@
   <div id="view-home" class="app-view active">
     <div id="ux_hero_carousel" data-include="components/hero-carousel.html"></div>
 
-    <div class="mx-auto w-full max-w-7xl px-4 pt-6" role="tablist">
-      <ul class="flex flex-wrap border-b border-gray-200 text-sm font-medium text-center text-gray-500">
-        <li>
-          <button type="button" role="tab" aria-selected="true"
-            class="active rounded-t-lg border-b-2 border-primary-600 p-4 text-primary-600">
-            <i class="fa-solid fa-plane-departure mr-2"></i>FLIGHTS
-          </button>
-        </li>
-        <li>
-          <button type="button" role="tab" aria-selected="false" class="rounded-t-lg border-b-2 border-transparent p-4 hover:text-primary-600">
-            <i class="fa-solid fa-bed mr-2"></i>HOTELS
-          </button>
-        </li>
-        <li>
-          <button type="button" role="tab" aria-selected="false" class="rounded-t-lg border-b-2 border-transparent p-4 hover:text-primary-600">
-            <i class="fa-solid fa-car mr-2"></i>CAR RENTALS
-          </button>
-        </li>
-      </ul>
-    </div>
-
-    <section class="mx-auto max-w-7xl px-4 py-8">
-      <form id="flight-search" class="grid grid-cols-1 gap-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm md:grid-cols-2 xl:grid-cols-6" aria-label="Flight search">
-        <div>
-          <label for="from-city" class="mb-2 block text-sm font-medium text-gray-900">From city</label>
-          <select id="from-city" name="from" required
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600">
-            <option value="">Select city</option>
-          </select>
+    <section class="flight-finder-shell" aria-label="Book a flight">
+      <div class="fare-pills" aria-label="Featured destinations">
+        <span class="fare-pill active">Top picks for you</span>
+        <span class="fare-pill">Cebu</span>
+        <span class="fare-pill">Singapore</span>
+        <span class="fare-pill">Bangkok</span>
+      </div>
+      <form id="flight-search" class="flight-finder" aria-label="Flight search">
+        <div class="finder-heading">
+          <span><i class="fa-solid fa-plane"></i> Flight</span>
+          <span class="trip-type">Round-trip <i class="fa-solid fa-chevron-down"></i></span>
         </div>
-        <div>
-          <label for="to-city" class="mb-2 block text-sm font-medium text-gray-900">To city</label>
-          <select id="to-city" name="to" required
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600">
-            <option value="">Select city</option>
-          </select>
-        </div>
-        <div>
-          <label for="depart-date" class="mb-2 block text-sm font-medium text-gray-900">Depart date</label>
-          <input type="date" id="depart-date" name="depart" required
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600" />
-        </div>
-        <div>
-          <label for="return-date" class="mb-2 block text-sm font-medium text-gray-900">Return date</label>
-          <input type="date" id="return-date" name="return"
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600" />
-        </div>
-        <div>
-          <label for="class" class="mb-2 block text-sm font-medium text-gray-900">Class</label>
-          <select id="class" name="class"
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600">
-            <option value="economy">Economy</option>
-            <option value="premium_economy">Premium Economy</option>
-            <option value="business">Business</option>
-            <option value="first">First</option>
-          </select>
-        </div>
-        <div>
-          <label for="passengers" class="mb-2 block text-sm font-medium text-gray-900">Passengers</label>
-          <input type="number" id="passengers" name="passengers" min="1" max="9" value="1"
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-600 focus:ring-primary-600" />
-        </div>
-        <div class="xl:col-span-6">
-          <button type="submit"
-            class="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-700">SEARCH FLIGHTS</button>
+        <div class="finder-grid">
+          <div class="finder-field">
+            <label for="from-city">From</label>
+            <select id="from-city" name="from" required><option value="">Select origin</option></select>
+          </div>
+          <div class="finder-field">
+            <label for="to-city">To</label>
+            <select id="to-city" name="to" required><option value="">Select destination</option></select>
+          </div>
+          <div class="finder-field">
+            <label for="depart-date">Depart</label>
+            <input type="date" id="depart-date" name="depart" required />
+          </div>
+          <div class="finder-field">
+            <label for="return-date">Return</label>
+            <input type="date" id="return-date" name="return" />
+          </div>
+          <div class="finder-field compact">
+            <label for="class">Cabin</label>
+            <select id="class" name="class">
+              <option value="economy">Economy</option><option value="premium_economy">Premium Economy</option><option value="business">Business</option><option value="first">First</option>
+            </select>
+          </div>
+          <div class="finder-field compact">
+            <label for="passengers">Guests</label>
+            <input type="number" id="passengers" name="passengers" min="1" max="9" value="1" />
+          </div>
+          <button type="submit" class="finder-submit">Search flights <i class="fa-solid fa-arrow-right"></i></button>
         </div>
       </form>
     </section>
