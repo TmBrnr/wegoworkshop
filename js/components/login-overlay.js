@@ -6,6 +6,18 @@
   var overlay = null;
   var bound = false;
   var isLoading = false;
+  var customCloseEnabled = true;
+
+  function setCustomCloseEnabled(enabled) {
+    customCloseEnabled = enabled !== false;
+    var closeBtn = document.querySelector('.login-overlay-close');
+    if (closeBtn) closeBtn.classList.toggle('hidden', !customCloseEnabled);
+    return customCloseEnabled;
+  }
+
+  function canCustomClose() {
+    return customCloseEnabled;
+  }
 
   function getOverlay() {
     return document.getElementById('login-overlay');
@@ -154,8 +166,13 @@
       });
     });
 
+    document.addEventListener('click', function(e) {
+      if (!customCloseEnabled || !overlay || overlay.classList.contains('hidden')) return;
+      if (e.target.closest('.login-overlay-close') || e.target === overlay) close();
+    });
+
     document.addEventListener('keydown', function onEscape(e) {
-      if (e.key === 'Escape' && overlay && !overlay.classList.contains('hidden')) close();
+      if (customCloseEnabled && e.key === 'Escape' && overlay && !overlay.classList.contains('hidden')) close();
     });
   }
 
@@ -191,5 +208,5 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  window.LoginOverlay = { open: open, close: close };
+  window.LoginOverlay = { open: open, close: close, setCustomCloseEnabled: setCustomCloseEnabled, canCustomClose: canCustomClose };
 })();

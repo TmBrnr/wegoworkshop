@@ -7,7 +7,7 @@
 
   function getProfile() {
     if (typeof window.getCurrentUser === 'function') {
-      return window.getCurrentUser();
+      return window.getCurrentUser() || {};
     }
     return {};
   }
@@ -110,6 +110,11 @@
           attrListEl.appendChild(dd);
         });
       }
+    }
+
+    var customCloseToggle = document.getElementById('braze-debug-custom-close');
+    if (customCloseToggle && window.LoginOverlay && typeof window.LoginOverlay.canCustomClose === 'function') {
+      customCloseToggle.checked = window.LoginOverlay.canCustomClose();
     }
 
     var listEl = document.getElementById('braze-events-list');
@@ -244,8 +249,22 @@
     if (e.target.closest('#ux_braze')) {
       e.preventDefault();
       toggle();
+    } else if (e.target.closest('#braze-debug-open-login')) {
+      if (window.LoginOverlay) window.LoginOverlay.open();
+    } else if (e.target.closest('#braze-debug-close-login')) {
+      if (window.LoginOverlay) window.LoginOverlay.close();
+    } else if (e.target.closest('#braze-debug-log-event')) {
+      addEvent('braze_debug_event', { source: 'debug_menu' });
+      render();
     } else if (e.target.closest('.braze-panel-close') || e.target.closest('.braze-panel-backdrop')) {
       close();
+    }
+  });
+
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'braze-debug-custom-close' && window.LoginOverlay) {
+      window.LoginOverlay.setCustomCloseEnabled(e.target.checked);
+      addEvent('login_custom_close_changed', { enabled: e.target.checked });
     }
   });
 
