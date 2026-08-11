@@ -11,7 +11,7 @@
 
   var DEMO_SLIDES = [
     {
-      backgroundImage: getMediaUrl("../media/hero_sea.jpg"),
+      backgroundImage: getMediaUrl("../media/hero_iloilo.png"),
       title: 'ILOILO',
       text: '',
       ctaHref: '#flight-search',

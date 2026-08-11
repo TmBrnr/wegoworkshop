@@ -1,28 +1,21 @@
 <header id="ux_header" class="airline-header">
   <div class="travel-advisory">
-    <span><i class="fa-solid fa-circle-info"></i> <strong>Travel Advisory:</strong> Integration of AirSWIFT into Cebgo Operations</span>
-    <a href="#ux_promo_feed"><i class="fa-solid fa-chevron-left"></i>&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-chevron-right"></i>&nbsp;&nbsp;&nbsp; View all</a>
+    <div class="advisory-message"><span><i class="fa-solid fa-circle-info"></i> <strong>Travel Advisory:</strong> Integration of AirSWIFT into Cebgo Operations</span><a href="#ux_promo_feed"><i class="fa-solid fa-chevron-left"></i><i class="fa-solid fa-chevron-right"></i><strong>View all</strong></a></div>
+    <div class="top-utilities"><span>PHP <i class="fa-solid fa-chevron-down"></i></span><span><i class="fa-solid fa-globe"></i> English <i class="fa-solid fa-chevron-down"></i></span><strong>Help</strong></div>
   </div>
   <nav class="airline-nav" id="ux_header_nav" aria-label="Main navigation">
     <a href="index.html" class="airline-brand" aria-label="Cebu Pacific home">
-      <span class="brand-bird"><i class="fa-solid fa-dove"></i></span>
-      <span class="brand-copy"><strong>cebu pacific</strong><small>Let&apos;s fly every Juan</small></span>
+      <img src="https://cdn.media.amplience.net/i/cebupacificair/CEB_logo_Noto_Sans_Linear_White?fmt=auto&amp;maxW=1920&amp;maxH=1920&amp;w=206&amp;h=67&amp;sm=c&amp;&amp;poi={$this.metadata.pointOfInterest.x},{$this.metadata.pointOfInterest.y},{$this.metadata.pointOfInterest.w},{$this.metadata.pointOfInterest.h}" width="206" height="67" alt="Cebu Pacific">
     </a>
     <div class="primary-nav-links">
       <a href="#flight-search">Book</a><a href="#view-booking">Manage</a><a href="#ux_promo_feed">Travel Info</a><a href="#ux_promo_feed">Explore</a><a href="#airline-story">About</a>
     </div>
     <div class="header-utilities">
-      <span class="currency">PHP <i class="fa-solid fa-chevron-down"></i></span>
-      <span class="language"><i class="fa-solid fa-globe"></i> English</span>
-      <a id="ux_notifications" href="#" role="button" aria-expanded="false" aria-haspopup="true" aria-controls="ux_notifications_overlay" aria-label="Notifications" class="header-icon">
-        <i class="fa-regular fa-bell"></i><span id="ux_notifications_count">4</span>
-      </a>
+      <a id="ux_notifications" href="#" role="button" aria-expanded="false" aria-haspopup="true" aria-controls="ux_notifications_overlay" aria-label="Notifications" class="header-icon utility-notification"><i class="fa-regular fa-bell"></i><span id="ux_notifications_count">4</span></a>
       <a id="ux_account" href="#" role="button" aria-expanded="false" aria-haspopup="true" aria-controls="account-overlay" aria-label="Account" class="header-account-hidden header-icon"><i class="fa-regular fa-circle-user"></i></a>
-      <a id="ux_login" href="#" class="login-link"><i class="fa-regular fa-circle-user"></i> Log in</a>
-      <div class="utility-menu">
-        <button type="button" aria-label="Open tools"><i class="fa-solid fa-bars"></i></button>
-        <div class="utility-dropdown"><a id="ux_reset" href="index.html">Reset demo</a><a id="ux_braze" href="#" role="button" aria-expanded="false" aria-controls="braze-panel">Braze tools</a></div>
-      </div>
+      <a id="ux_login" href="#" class="login-link"><i class="fa-solid fa-circle-user"></i> Log in</a>
+      <button type="button" class="search-trigger" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <div class="utility-menu"><button type="button" aria-label="Open tools"><i class="fa-solid fa-bars"></i></button><div class="utility-dropdown"><a id="ux_reset" href="index.html">Reset demo</a><a id="ux_braze" href="#" role="button" aria-expanded="false" aria-controls="braze-panel">Braze tools</a></div></div>
     </div>
   </nav>
 
