@@ -12,10 +12,10 @@
   var DEMO_SLIDES = [
     {
       backgroundImage: getMediaUrl("../media/hero_sea.jpg"),
-      title: 'Hello, Cebu',
-      text: 'Trade city streets for turquoise seas. Your island escape is closer than you think.',
-      ctaHref: '#ux_promo_feed',
-      ctaLabel: 'Explore deals'
+      title: 'ILOILO',
+      text: '',
+      ctaHref: '#flight-search',
+      ctaLabel: ''
     },
     {
       backgroundImage: getMediaUrl("../media/hero_singapore.jpg"),
