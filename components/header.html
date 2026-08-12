@@ -27,19 +27,22 @@
   <div class="notifications-backdrop panel-backdrop hidden"></div>
 
   <div id="ux_container_login_overlay">
-    <div id="login-overlay" tabindex="-1" aria-hidden="true" class="modal-shell hidden">
-      <div class="modal-card login-card"><button type="button" class="login-overlay-close" aria-label="Close login screen"><i class="fa-solid fa-xmark"></i></button><h2 id="login-title">Welcome aboard</h2><p>Select a demo traveler to sign in.</p><div id="demo-user-list"></div><p id="demo-user-loading" class="hidden">Signing in and loading Braze profile...</p><p id="demo-user-error" class="hidden"></p></div>
+    <div id="login-overlay" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="login-title" aria-describedby="login-description" aria-hidden="true" class="modal-shell login-shell hidden">
+      <div class="modal-card login-card"><button type="button" class="login-overlay-close" aria-label="Close login screen"><i class="fa-solid fa-xmark"></i></button><div class="login-brand-mark" aria-hidden="true"><i class="fa-solid fa-plane-departure"></i></div><p class="login-kicker">Cebu Pacific traveler access</p><h2 id="login-title">Welcome aboard</h2><p id="login-description" class="login-description">Choose a demo traveler to continue to their saved profile and personalized Braze experience.</p><div id="demo-user-list" class="demo-user-list"></div><p id="demo-user-loading" class="login-status hidden" role="status"><i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Signing in and loading Braze profile...</p><p id="demo-user-error" class="login-error hidden" role="alert"></p><p class="login-privacy"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Demo access only. No password is required.</p></div>
     </div>
   </div>
 
-  <div id="account-overlay" tabindex="-1" aria-hidden="true" class="modal-shell hidden">
-    <div class="modal-card account-card">
-      <div class="panel-header"><h2 id="account-title">My account</h2><button type="button" class="account-close" aria-label="Close account"><i class="fa-solid fa-xmark"></i></button></div>
-      <div class="account-details">
-        <p><strong>Name</strong><span id="account-profile-name">–</span></p><p><strong>Phone</strong><span id="account-profile-phone">–</span></p><p><strong>Email</strong><span id="account-profile-email">–</span></p><p><strong>Passport</strong><span id="account-profile-passport">–</span></p><p><strong>Card number</strong><span id="account-profile-card-number">–</span></p><p><strong>Name on card</strong><span id="account-profile-card-name">–</span></p><p><strong>Expiry</strong><span id="account-profile-expiry">–</span></p><p><strong>Billing address</strong><span id="account-profile-address">–</span></p>
-        <button type="button" id="account-logout-btn">Logout</button>
+  <div id="account-overlay" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="account-title" aria-hidden="true" class="account-shell hidden">
+    <button type="button" class="account-backdrop" aria-label="Close account"></button>
+    <aside class="account-drawer" aria-label="Account details">
+      <div class="account-hero"><button type="button" class="account-close" aria-label="Close account"><i class="fa-solid fa-xmark"></i></button><div id="account-profile-initials" class="account-avatar" aria-hidden="true">TR</div><div><p class="account-eyebrow">My account</p><h2 id="account-title">Traveler profile</h2><p>Saved details for a smoother journey.</p></div></div>
+      <div class="account-content">
+        <section class="account-section" aria-labelledby="account-personal-heading"><h3 id="account-personal-heading"><i class="fa-regular fa-user"></i> Personal details</h3><dl><div><dt>Name</dt><dd id="account-profile-name">–</dd></div><div><dt>Phone</dt><dd id="account-profile-phone">–</dd></div><div><dt>Email</dt><dd id="account-profile-email">–</dd></div></dl></section>
+        <section class="account-section" aria-labelledby="account-travel-heading"><h3 id="account-travel-heading"><i class="fa-solid fa-passport"></i> Travel document</h3><dl><div><dt>Passport</dt><dd id="account-profile-passport">–</dd></div></dl></section>
+        <section class="account-section" aria-labelledby="account-payment-heading"><h3 id="account-payment-heading"><i class="fa-regular fa-credit-card"></i> Payment details</h3><dl><div><dt>Card number</dt><dd id="account-profile-card-number">–</dd></div><div><dt>Name on card</dt><dd id="account-profile-card-name">–</dd></div><div><dt>Expiry</dt><dd id="account-profile-expiry">–</dd></div><div><dt>Billing address</dt><dd id="account-profile-address">–</dd></div></dl></section>
       </div>
-    </div>
+      <div class="account-actions"><button type="button" id="account-logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</button><p>You can sign in again with another demo traveler.</p></div>
+    </aside>
   </div>
 
   <div id="braze-panel-overlay" aria-hidden="true" class="side-panel braze-side-panel -translate-x-full">
