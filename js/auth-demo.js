@@ -99,6 +99,9 @@
       .then(function (res) {
         if (!res.ok) {
           return res.json().catch(function () { return {}; }).then(function (data) {
+            if (res.status === 503 && data && data.code === 'BRAZE_PROFILE_LOOKUP_UNAVAILABLE') {
+              return { profileLookupUnavailable: true };
+            }
             var msg = data && data.error ? data.error : 'Unable to load Braze user profile';
             throw new Error(msg);
           });
@@ -164,7 +167,7 @@
           window.BrazePanel.addEvent('logged-in', { externalId: user.externalId, deviceId: user.deviceId });
         }
 
-        if (typeof callback === 'function') callback(err, user);
+        if (typeof callback === 'function') callback(null, user, err || null);
         resolve(user);
       });
     });

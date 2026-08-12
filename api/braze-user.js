@@ -21,8 +21,9 @@ module.exports = async function handler(req, res) {
   var brazeRestEndpoint = process.env.BRAZE_REST_ENDPOINT;
 
   if (!brazeApiKey || !brazeRestEndpoint) {
-    return res.status(500).json({
-      error: 'Missing BRAZE_API_KEY or BRAZE_REST_ENDPOINT environment variable'
+    return res.status(503).json({
+      error: 'Braze REST profile lookup is not configured',
+      code: 'BRAZE_PROFILE_LOOKUP_UNAVAILABLE'
     });
   }
 
