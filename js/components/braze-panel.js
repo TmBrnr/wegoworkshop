@@ -117,6 +117,16 @@
       customCloseToggle.checked = window.LoginOverlay.canCustomClose();
     }
 
+    if (window.Braze2 && typeof window.Braze2.getConfig === 'function') {
+      var sdkConfig = window.Braze2.getConfig();
+      var sdkKeyInput = document.getElementById('braze-debug-sdk-key');
+      var sdkEndpointInput = document.getElementById('braze-debug-sdk-endpoint');
+      var configSource = document.getElementById('braze-debug-config-source');
+      if (sdkKeyInput && document.activeElement !== sdkKeyInput) sdkKeyInput.value = sdkConfig.apiKey || '';
+      if (sdkEndpointInput && document.activeElement !== sdkEndpointInput) sdkEndpointInput.value = sdkConfig.baseUrl || '';
+      if (configSource) configSource.textContent = 'Loaded from: ' + sdkConfig.source + '. Changes reload the page.';
+    }
+
     var listEl = document.getElementById('braze-events-list');
     if (listEl) {
       listEl.innerHTML = '';
@@ -253,6 +263,20 @@
       if (window.LoginOverlay) window.LoginOverlay.open();
     } else if (e.target.closest('#braze-debug-close-login')) {
       if (window.LoginOverlay) window.LoginOverlay.close();
+    } else if (e.target.closest('#braze-debug-save-config')) {
+      var keyInput = document.getElementById('braze-debug-sdk-key');
+      var endpointInput = document.getElementById('braze-debug-sdk-endpoint');
+      var key = keyInput ? keyInput.value.trim() : '';
+      var endpoint = endpointInput ? endpointInput.value.trim() : '';
+      if (!key || !endpoint) {
+        if (window.Toast) window.Toast.show('SDK key and endpoint are required.', 'error');
+        return;
+      }
+      window.Braze2.setConfig({ apiKey: key, baseUrl: endpoint });
+      window.location.reload();
+    } else if (e.target.closest('#braze-debug-reset-config')) {
+      if (window.Braze2) window.Braze2.clearConfig();
+      window.location.reload();
     } else if (e.target.closest('#braze-debug-log-event')) {
       addEvent('braze_debug_event', { source: 'debug_menu' });
       render();
