@@ -117,6 +117,14 @@
       customCloseToggle.checked = window.LoginOverlay.canCustomClose();
     }
 
+    if (window.BrazeRestDebug) {
+      var restConfig = window.BrazeRestDebug.getConfig();
+      var restStatus = document.getElementById('braze-debug-rest-status');
+      if (restStatus) restStatus.textContent = restConfig.configured
+        ? 'Configured for this page only. Cleared automatically on reload.'
+        : 'Not configured. Values are held in memory only and cleared on reload.';
+    }
+
     if (window.Braze2 && typeof window.Braze2.getConfig === 'function') {
       var sdkConfig = window.Braze2.getConfig();
       var sdkKeyInput = document.getElementById('braze-debug-sdk-key');
@@ -263,6 +271,26 @@
       if (window.LoginOverlay) window.LoginOverlay.open();
     } else if (e.target.closest('#braze-debug-close-login')) {
       if (window.LoginOverlay) window.LoginOverlay.close();
+    } else if (e.target.closest('#braze-debug-apply-rest-config')) {
+      var restKeyInput = document.getElementById('braze-debug-rest-key');
+      var restEndpointInput = document.getElementById('braze-debug-rest-endpoint');
+      var restKey = restKeyInput ? restKeyInput.value.trim() : '';
+      var restEndpoint = restEndpointInput ? restEndpointInput.value.trim() : '';
+      if (!restKey || !restEndpoint) {
+        if (window.Toast) window.Toast.show('REST API key and endpoint are required.', 'error');
+        return;
+      }
+      window.BrazeRestDebug.setConfig({ apiKey: restKey, endpoint: restEndpoint });
+      if (restKeyInput) restKeyInput.value = '';
+      render();
+      if (window.Toast) window.Toast.show('Temporary REST credentials applied for this page.', 'success');
+    } else if (e.target.closest('#braze-debug-clear-rest-config')) {
+      if (window.BrazeRestDebug) window.BrazeRestDebug.clearConfig();
+      var clearKeyInput = document.getElementById('braze-debug-rest-key');
+      var clearEndpointInput = document.getElementById('braze-debug-rest-endpoint');
+      if (clearKeyInput) clearKeyInput.value = '';
+      if (clearEndpointInput) clearEndpointInput.value = '';
+      render();
     } else if (e.target.closest('#braze-debug-save-config')) {
       var keyInput = document.getElementById('braze-debug-sdk-key');
       var endpointInput = document.getElementById('braze-debug-sdk-endpoint');

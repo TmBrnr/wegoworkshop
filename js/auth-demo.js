@@ -85,6 +85,28 @@
     }
   }
 
+  var temporaryRestConfig = { apiKey: '', endpoint: '' };
+
+  function setTemporaryRestConfig(config) {
+    temporaryRestConfig.apiKey = config && config.apiKey ? String(config.apiKey).trim() : '';
+    temporaryRestConfig.endpoint = config && config.endpoint ? String(config.endpoint).trim().replace(/\/$/, '') : '';
+    return getTemporaryRestConfig();
+  }
+
+  function getTemporaryRestConfig() {
+    return {
+      apiKey: temporaryRestConfig.apiKey,
+      endpoint: temporaryRestConfig.endpoint,
+      configured: Boolean(temporaryRestConfig.apiKey && temporaryRestConfig.endpoint)
+    };
+  }
+
+  function clearTemporaryRestConfig() {
+    temporaryRestConfig.apiKey = '';
+    temporaryRestConfig.endpoint = '';
+    return getTemporaryRestConfig();
+  }
+
   function fetchBrazeProfile(externalId, callback) {
     var id = externalId != null ? String(externalId).trim() : '';
     if (!id) {
@@ -92,9 +114,15 @@
       return;
     }
 
+    var requestHeaders = { Accept: 'application/json' };
+    if (temporaryRestConfig.apiKey && temporaryRestConfig.endpoint) {
+      requestHeaders['X-Braze-Rest-Key'] = temporaryRestConfig.apiKey;
+      requestHeaders['X-Braze-Rest-Endpoint'] = temporaryRestConfig.endpoint;
+    }
+
     fetch('/api/braze-user?external_id=' + encodeURIComponent(id), {
       method: 'GET',
-      headers: { Accept: 'application/json' }
+      headers: requestHeaders
     })
       .then(function (res) {
         if (!res.ok) {
@@ -211,6 +239,11 @@
   window.getDemoUser = getDemoUser;
   window.getCurrentUser = getCurrentUser;
   window.fetchBrazeProfile = fetchBrazeProfile;
+  window.BrazeRestDebug = {
+    setConfig: setTemporaryRestConfig,
+    getConfig: getTemporaryRestConfig,
+    clearConfig: clearTemporaryRestConfig
+  };
   window.loginAsDemo = loginAsDemo;
   window.setLoggedIn = setLoggedIn;
   window.logout = logout;
