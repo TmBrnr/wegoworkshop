@@ -183,6 +183,25 @@
    * @param {string} key - Attribute key.
    * @param {*} value - Attribute value (string, number, boolean, or array of strings).
    */
+  function updateStandardProfile(profile) {
+    var braze = getBraze();
+    var user = braze && typeof braze.getUser === 'function' ? braze.getUser() : null;
+    profile = profile || {};
+    if (user) {
+      try {
+        if (profile.firstName && typeof user.setFirstName === 'function') user.setFirstName(profile.firstName);
+        if (profile.lastName && typeof user.setLastName === 'function') user.setLastName(profile.lastName);
+        if (profile.email && typeof user.setEmail === 'function') user.setEmail(profile.email);
+        if (profile.phone && typeof user.setPhoneNumber === 'function') user.setPhoneNumber(profile.phone);
+      } catch (e) {
+        window.AppLogger.warn('[SDK]', 'Braze2: standard profile update failed', e);
+      }
+    }
+    ['firstName', 'lastName', 'email', 'phone'].forEach(function (key) {
+      if (profile[key]) localAttributes[key] = profile[key];
+    });
+  }
+
   function updateUserAttribute(key, value) {
     var braze = getBraze();
     if (braze && typeof braze.User !== 'undefined' && typeof braze.User.setCustomUserAttribute === 'function') {
@@ -290,6 +309,7 @@
     changeUser: changeUser,
     trackEvent: trackEvent,
     updateUserAttribute: updateUserAttribute,
+    updateStandardProfile: updateStandardProfile,
     getUserProfile: getUserProfile,
     subscribeToContentCardsUpdates: subscribeToContentCardsUpdates,
     subscribeToBannersUpdates: subscribeToBannersUpdates,

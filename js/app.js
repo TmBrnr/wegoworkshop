@@ -7,8 +7,11 @@
   'use strict';
 
   var VIEW_IDS = ['view-home', 'view-results', 'view-booking', 'view-complete'];
-  var STEP_ORDER = ['baggage', 'seats', 'meals', 'others', 'passenger', 'review', 'payment'];
+  var STEP_ORDER = ['passenger', 'baggage', 'seats', 'meals', 'others', 'review'];
   var currentBookingStep = null;
+  var viewedStages = {};
+  var journeyId = window.sessionStorage.getItem('wego_journey_id') || ('journey_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8));
+  window.sessionStorage.setItem('wego_journey_id', journeyId);
   var resultsFlights = [];
   var resultsSortBy = 'price';
   var resultsFilterAirline = null;
@@ -16,6 +19,43 @@
 
   var BTN_PRIMARY = 'rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-700';
   var BTN_SECONDARY = 'rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100';
+
+  function trackJourneyEvent(name, properties, refresh) {
+    var payload = Object.assign({ journey_id: journeyId }, properties || {});
+    if (window.Braze2) {
+      window.Braze2.trackEvent(name, payload);
+      if (refresh) {
+        var braze = window.Braze2.getBraze();
+        if (braze && typeof braze.requestBannersRefresh === 'function') braze.requestBannersRefresh([CONTAINER_ID]);
+        if (braze && typeof braze.requestContentCardsRefresh === 'function') braze.requestContentCardsRefresh();
+      }
+    }
+    if (window.BrazePanel) window.BrazePanel.addEvent(name, payload);
+  }
+
+  function trackStageOnce(stage, name, properties) {
+    if (viewedStages[stage]) return;
+    viewedStages[stage] = true;
+    trackJourneyEvent(name, Object.assign({ journey_stage: stage }, properties || {}), true);
+  }
+
+  function ancillaryValue(p) {
+    var value = 0;
+    var baggage = BAGGAGE_OPTIONS.find(function (item) { return item.id === p.baggage; });
+    var meal = MEAL_OPTIONS.find(function (item) { return item.id === p.meal; });
+    if (baggage && baggage.price) value += Number(baggage.price);
+    if (meal && meal.price) value += Number(meal.price);
+    value += p.seats.length * 12;
+    p.ancillaries.forEach(function (id) {
+      var item = ANCILLARY_OPTIONS.find(function (option) { return option.id === id; });
+      if (item && item.price) value += Number(item.price);
+    });
+    return value;
+  }
+
+  function routeContext(p) {
+    return { origin: p.from, destination: p.to, cabin: p.flightClass, passenger_count: Number(p.passengers) || 1 };
+  }
 
   function seatClass(isOccupied, isSelected) {
     var base = 'seat h-9 w-9 rounded border text-xs font-semibold transition ';
@@ -41,6 +81,14 @@
     });
     updateBookingSummary(stepId);
     renderStep(stepId);
+    var params = getBookingParams();
+    if (stepId === 'passenger') trackStageOnce('guest_details', 'guest_details_viewed', routeContext(params));
+    if (stepId === 'baggage') trackStageOnce('ancillaries', 'ancillaries_viewed', routeContext(params));
+    if (stepId === 'review') {
+      var flights = generateMockFlights({ from: params.from, to: params.to, departDate: params.depart, returnDate: params.returnDate, class: params.flightClass, passengers: Number(params.passengers) || 1 });
+      var flight = flights[params.flightIndex] || flights[0];
+      trackStageOnce('booking_summary', 'booking_summary_viewed', Object.assign(routeContext(params), { fare_value: flight.price, ancillary_value: ancillaryValue(params), estimated_total: Number(flight.price) + ancillaryValue(params), ancillary_categories: ['baggage', 'seats', 'meal', 'extras'].filter(function (category) { return category === 'baggage' ? !!params.baggage : category === 'seats' ? !!params.seats.length : category === 'meal' ? !!params.meal : !!params.ancillaries.length; }) }));
+    }
     if (window.BookingSteps && window.BookingSteps.setActiveStep) {
       window.BookingSteps.setActiveStep(stepId);
     }
@@ -130,7 +178,7 @@
 
     var extraRows = ['row-sum-passenger', 'row-sum-baggage', 'row-sum-seats', 'row-sum-meal', 'row-sum-ancillaries'];
     extraRows.forEach(function (id) { var r = document.getElementById(id); if (r) r.style.display = 'none'; });
-    if (stepId === 'payment') {
+    if (stepId === 'review') {
       var sumPassenger = document.getElementById('sum-passenger');
       var sumBaggage = document.getElementById('sum-baggage');
       var sumSeats = document.getElementById('sum-seats');
@@ -182,11 +230,12 @@
         card.querySelector('.select-baggage').addEventListener('click', function () {
           selectedBaggage = opt.id;
           setBookingState({ baggage: opt.id });
+          trackJourneyEvent('ancillary_updated', Object.assign(routeContext(getBookingParams()), { category: 'baggage', item_id: opt.id, action: 'selected', quantity: 1, ancillary_value: Number(opt.price) || 0 }), false);
           updateBaggageSelection();
         });
         baggageCards.appendChild(card);
       });
-      document.getElementById('baggage-prev').onclick = function () { showView('view-results'); };
+      document.getElementById('baggage-prev').onclick = function () { showBookingStep('passenger'); };
       document.getElementById('baggage-next').onclick = function () {
         setBookingState({ baggage: selectedBaggage });
         showBookingStep('seats');
@@ -227,6 +276,7 @@
                 s.className = seatClass(occupiedSeat, selectedSeat);
               });
               setBookingState({ seats: selectedSeats.join(',') });
+              trackJourneyEvent('ancillary_updated', Object.assign(routeContext(getBookingParams()), { category: 'seat', item_id: id, action: idx !== -1 ? 'removed' : 'selected', quantity: selectedSeats.length, ancillary_value: selectedSeats.length * 12 }), false);
             });
           }
           left.appendChild(seat);
@@ -254,6 +304,7 @@
                 s.className = seatClass(occupiedSeat, selectedSeat);
               });
               setBookingState({ seats: selectedSeats.join(',') });
+              trackJourneyEvent('ancillary_updated', Object.assign(routeContext(getBookingParams()), { category: 'seat', item_id: id, action: idx !== -1 ? 'removed' : 'selected', quantity: selectedSeats.length, ancillary_value: selectedSeats.length * 12 }), false);
             });
           }
           aisle.appendChild(seat);
@@ -295,6 +346,7 @@
         card.querySelector('.select-meal').addEventListener('click', function () {
           selectedMeal = opt.id;
           setBookingState({ meal: opt.id });
+          trackJourneyEvent('ancillary_updated', Object.assign(routeContext(getBookingParams()), { category: 'meal', item_id: opt.id, action: 'selected', quantity: 1, ancillary_value: Number(opt.price) || 0 }), false);
           updateMealSelection();
         });
         mealCards.appendChild(card);
@@ -323,6 +375,7 @@
           else selectedAncillaries = selectedAncillaries.concat(opt.id).sort();
           setBookingState({ ancillaries: selectedAncillaries.join(',') });
           var selected = selectedAncillaries.indexOf(opt.id) !== -1;
+          trackJourneyEvent('ancillary_updated', Object.assign(routeContext(getBookingParams()), { category: 'extra', item_id: opt.id, action: selected ? 'selected' : 'removed', quantity: selectedAncillaries.length, ancillary_value: ancillaryValue(getBookingParams()) }), false);
           card.classList.toggle('selected', selected);
           card.classList.toggle('border-primary-600', selected);
           card.classList.toggle('bg-primary-50', selected);
@@ -337,8 +390,9 @@
       document.getElementById('others-prev').onclick = function () { setBookingState({ ancillaries: selectedAncillaries.join(',') }); showBookingStep('meals'); };
       document.getElementById('others-next').onclick = function () {
         setBookingState({ ancillaries: selectedAncillaries.join(',') });
-        showBookingStep('passenger');
-        window.Braze2.getBraze().requestBannersRefresh([CONTAINER_ID]);
+        var completed = getBookingParams();
+        trackJourneyEvent('ancillaries_completed', Object.assign(routeContext(completed), { baggage: completed.baggage || 'none', seat_count: completed.seats.length, meal: completed.meal || 'none', extras: completed.ancillaries, ancillary_value: ancillaryValue(completed) }), true);
+        showBookingStep('review');
       };
     }
 
@@ -368,7 +422,7 @@
           if (window.LoginOverlay && window.LoginOverlay.open) window.LoginOverlay.open();
         }, 500);
       }
-      document.getElementById('passenger-prev').onclick = function () { showBookingStep('others'); };
+      document.getElementById('passenger-prev').onclick = function () { showView('view-results'); };
       document.getElementById('passenger-next').onclick = function () {
         var name = (nameEl && nameEl.value) ? nameEl.value.trim() : '';
         var phone = (phoneEl && phoneEl.value) ? phoneEl.value.trim() : '';
@@ -381,7 +435,16 @@
         }
         if (msgEl) msgEl.textContent = '';
         setBookingState({ passengerName: name, passengerPhone: phone, passengerEmail: email, passengerPassport: passport || '' });
-        showBookingStep('review');
+        var normalizedEmail = email.toLowerCase();
+        var nameParts = name.split(/\s+/).filter(Boolean);
+        if (window.Braze2) {
+          window.Braze2.changeUser('guest_' + normalizedEmail);
+          window.Braze2.updateStandardProfile({ firstName: nameParts[0] || name, lastName: nameParts.slice(1).join(' '), email: normalizedEmail, phone: phone });
+          window.Braze2.updateUserAttribute('latest_journey_id', journeyId);
+          window.Braze2.updateUserAttribute('latest_route', p.from + '-' + p.to);
+        }
+        trackJourneyEvent('guest_details_submitted', Object.assign(routeContext(p), { has_phone: true, has_email: true, has_passport: Boolean(passport) }), true);
+        showBookingStep('baggage');
       };
     }
 
@@ -407,8 +470,11 @@
       document.getElementById('change-meals').onclick = function (e) { e.preventDefault(); showBookingStep('meals'); };
       document.getElementById('change-ancillaries').onclick = function (e) { e.preventDefault(); showBookingStep('others'); };
       document.getElementById('change-passenger').onclick = function (e) { e.preventDefault(); showBookingStep('passenger'); };
-      document.getElementById('review-prev').onclick = function () { showBookingStep('passenger'); };
-      document.getElementById('proceed-payment').onclick = function () { showBookingStep('payment'); };
+      document.getElementById('review-prev').onclick = function () { showBookingStep('others'); };
+      document.getElementById('proceed-payment').onclick = function () {
+        trackJourneyEvent('continue_to_payment_clicked', Object.assign(routeContext(p), { ancillary_value: ancillaryValue(p), payment_collected: false }), true);
+        if (window.Toast) window.Toast.show('Demo journey complete — payment is intentionally not collected.', 'success');
+      };
     }
 
     if (stepId === 'payment') {
@@ -509,8 +575,9 @@
       div.innerHTML = '<div class="grid gap-4 xl:grid-cols-[1fr_auto]"><div class="legs space-y-4"><div class="leg grid gap-3 md:grid-cols-3"><div><div class="airline font-semibold text-gray-900">' + f.airlineName + '</div><div class="time text-xl font-semibold text-gray-900">' + f.departTime + '</div><div class="airport text-sm text-gray-600">' + f.from + ' ' + f.fromAirport + '</div></div><div class="meta text-sm text-gray-600">' + f.duration + '<br>' + f.planeType + '</div><div><div class="time text-xl font-semibold text-gray-900">' + f.arrivalTime + '</div><div class="airport text-sm text-gray-600">' + f.to + ' ' + f.toAirport + '</div></div></div><div class="leg-divider border-t border-dashed border-gray-300"></div><div class="leg grid gap-3 md:grid-cols-3"><div><div class="airline font-semibold text-gray-900">Return</div><div class="time text-xl font-semibold text-gray-900">' + f.departTime + '</div><div class="airport text-sm text-gray-600">' + f.to + '</div></div><div class="meta text-sm text-gray-600">' + f.duration + '</div><div><div class="time text-xl font-semibold text-gray-900">' + f.arrivalTime + '</div><div class="airport text-sm text-gray-600">' + f.from + '</div></div></div></div><div class="price-cell text-left xl:text-right"><div class="price mb-2 text-3xl font-bold text-primary-700">' + f.priceFormatted + '</div><button type="button" class="' + BTN_PRIMARY + ' buy-btn" data-index="' + originalIndex + '">BUY</button></div></div>';
       div.querySelector('.buy-btn').addEventListener('click', function () {
         setBookingState({ from: from, to: to, depart: depart, return: returnDate, class: flightClass, passengers: passengers, flightIndex: originalIndex });
+        trackJourneyEvent('flight_selected', { journey_stage: 'flight_search', origin: from, destination: to, cabin: flightClass, passenger_count: Number(passengers), airline: f.airlineName, flight_id: f.id || ('mock_' + originalIndex), departure_time: f.departTime, arrival_time: f.arrivalTime, fare_value: f.price }, true);
         showView('view-booking');
-        showBookingStep('baggage');
+        showBookingStep('passenger');
       });
       container.appendChild(div);
     });
@@ -548,7 +615,7 @@
   window.getCurrentBookingStep = getCurrentBookingStep;
 
   function init() {
-    resetBookingState();
+    trackStageOnce('homepage', 'homepage_viewed', { anonymous: true, page: 'homepage' });
     var fromSelect = document.getElementById('from-city');
     var toSelect = document.getElementById('to-city');
     if (fromSelect && toSelect && typeof TRAVEL_CITIES !== 'undefined') {
@@ -578,13 +645,7 @@
         var cls = document.getElementById('class').value;
         var passengers = (document.getElementById('passengers').value || '1');
         setSearchParams({ from: from, to: to, depart: depart, return: ret, class: cls, passengers: passengers });
-        if (window.Braze2) {
-          window.Braze2.trackEvent('searched-flight', { origin: from, destination: to, depart: depart, return: ret, class: cls, passengers: passengers });
-          window.Braze2.getBraze().requestBannersRefresh([CONTAINER_ID]);
-        }
-        if (window.BrazePanel) {
-          window.BrazePanel.addEvent('searched-flight', { "origin": from, "destination": to, "depart": depart, "return": ret, "class": cls, "passengers": passengers });
-        }
+        trackJourneyEvent('flight_search_submitted', { journey_stage: 'flight_search', origin: from, destination: to, departure_date: depart, return_date: ret || '', cabin: cls, passenger_count: Number(passengers) }, true);
         showView('view-results');
         renderResults();
       });
@@ -605,6 +666,12 @@
     }
 
     document.addEventListener('click', function (e) {
+      var promo = e.target.closest('.hero-carousel-cta, .promo-block a, [data-promo-id]');
+      if (promo) {
+        var promoContainer = promo.closest('[data-promo-id], .promo-block, .hero-carousel-slide');
+        var promoTitle = promoContainer && promoContainer.querySelector ? promoContainer.querySelector('.promo-title, .hero-carousel-title') : null;
+        trackJourneyEvent('promo_clicked', { journey_stage: 'homepage', promo_id: (promoContainer && promoContainer.getAttribute('data-promo-id')) || (promoTitle && promoTitle.textContent.trim()) || promo.textContent.trim(), placement: promo.closest('.hero-carousel') ? 'hero' : 'homepage_deals' }, true);
+      }
       var tabBtn = e.target.closest('[role="tab"]');
       if (tabBtn && tabBtn.parentElement && tabBtn.parentElement.parentElement) {
         var allTabs = tabBtn.parentElement.parentElement.querySelectorAll('[role="tab"]');
