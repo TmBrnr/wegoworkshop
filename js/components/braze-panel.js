@@ -121,8 +121,8 @@
       var restConfig = window.BrazeRestDebug.getConfig();
       var restStatus = document.getElementById('braze-debug-rest-status');
       if (restStatus) restStatus.textContent = restConfig.configured
-        ? 'Configured for this page only. Cleared automatically on reload.'
-        : 'Not configured. Values are held in memory only and cleared on reload.';
+        ? 'Configured for this tab. Credentials survive reloads and clear when the tab session ends.'
+        : 'Not configured. Credentials are retained only for this tab session.';
     }
 
     if (window.Braze2 && typeof window.Braze2.getConfig === 'function') {

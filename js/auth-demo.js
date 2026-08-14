@@ -85,11 +85,27 @@
     }
   }
 
+  var REST_CONFIG_SESSION_KEY = 'wego_braze_rest_config';
   var temporaryRestConfig = { apiKey: '', endpoint: '' };
+
+  try {
+    var savedRestConfig = JSON.parse(window.sessionStorage.getItem(REST_CONFIG_SESSION_KEY) || 'null');
+    if (savedRestConfig) {
+      temporaryRestConfig.apiKey = savedRestConfig.apiKey ? String(savedRestConfig.apiKey) : '';
+      temporaryRestConfig.endpoint = savedRestConfig.endpoint ? String(savedRestConfig.endpoint) : '';
+    }
+  } catch (e) {
+    window.AppLogger.warn('[AUTH]', 'Could not restore temporary Braze REST config', e);
+  }
 
   function setTemporaryRestConfig(config) {
     temporaryRestConfig.apiKey = config && config.apiKey ? String(config.apiKey).trim() : '';
     temporaryRestConfig.endpoint = config && config.endpoint ? String(config.endpoint).trim().replace(/\/$/, '') : '';
+    try {
+      window.sessionStorage.setItem(REST_CONFIG_SESSION_KEY, JSON.stringify(temporaryRestConfig));
+    } catch (e) {
+      window.AppLogger.warn('[AUTH]', 'Could not retain temporary Braze REST config', e);
+    }
     return getTemporaryRestConfig();
   }
 
@@ -104,6 +120,11 @@
   function clearTemporaryRestConfig() {
     temporaryRestConfig.apiKey = '';
     temporaryRestConfig.endpoint = '';
+    try {
+      window.sessionStorage.removeItem(REST_CONFIG_SESSION_KEY);
+    } catch (e) {
+      window.AppLogger.warn('[AUTH]', 'Could not clear temporary Braze REST config', e);
+    }
     return getTemporaryRestConfig();
   }
 
