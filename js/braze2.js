@@ -6,7 +6,7 @@
 (function (global) {
   'use strict';
 
-  var MAX_EVENTS_STORED = 10;
+  var MAX_EVENTS_STORED = 25;
   var localAttributes = {};
   var localEvents = [];
   var contentCardsSubscriptions = [];
