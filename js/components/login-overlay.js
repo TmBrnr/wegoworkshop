@@ -6,6 +6,19 @@
   var overlay = null;
   var bound = false;
   var isLoading = false;
+  var customCloseEnabled = true;
+  var lastFocusedElement = null;
+
+  function setCustomCloseEnabled(enabled) {
+    customCloseEnabled = enabled !== false;
+    var closeBtn = document.querySelector('.login-overlay-close');
+    if (closeBtn) closeBtn.classList.toggle('hidden', !customCloseEnabled);
+    return customCloseEnabled;
+  }
+
+  function canCustomClose() {
+    return customCloseEnabled;
+  }
 
   function getOverlay() {
     return document.getElementById('login-overlay');
@@ -43,28 +56,33 @@
     var label = user && user.label ? String(user.label) : externalId;
 
     var row = document.createElement('div');
-    row.className = 'flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3';
+    row.className = 'demo-traveler-card';
+
+    var avatar = document.createElement('span');
+    avatar.className = 'demo-traveler-avatar';
+    avatar.setAttribute('aria-hidden', 'true');
+    avatar.textContent = (label || externalId || 'Traveler').split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) { return part.charAt(0); }).join('').toUpperCase();
 
     var left = document.createElement('div');
-    left.className = 'min-w-0 pr-3';
+    left.className = 'demo-traveler-copy';
 
-    var nameEl = document.createElement('p');
-    nameEl.className = 'truncate text-sm font-medium text-gray-900';
-    nameEl.textContent = label || 'Demo user';
+    var nameEl = document.createElement('strong');
+    nameEl.textContent = label || 'Demo traveler';
 
-    var externalEl = document.createElement('p');
-    externalEl.className = 'truncate text-xs text-gray-600';
-    externalEl.textContent = externalId || 'unknown';
+    var externalEl = document.createElement('span');
+    externalEl.textContent = 'Traveler ID: ' + (externalId || 'unknown');
 
     left.appendChild(nameEl);
     left.appendChild(externalEl);
 
     var btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'demo-user-login-btn rounded-lg bg-primary-600 px-3 py-2 text-xs font-medium text-white hover:bg-primary-700';
+    btn.className = 'demo-user-login-btn';
     btn.setAttribute('data-external-id', externalId);
-    btn.textContent = 'Login';
+    btn.setAttribute('aria-label', 'Continue as ' + (label || externalId || 'demo traveler'));
+    btn.innerHTML = '<span>Continue</span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i>';
 
+    row.appendChild(avatar);
     row.appendChild(left);
     row.appendChild(btn);
     return row;
@@ -94,6 +112,7 @@
     if (!overlay) return;
     // Keep login modal independent from Flowbite backdrop because this overlay
     // is nested inside the header stacking context.
+    lastFocusedElement = document.activeElement;
     overlay.classList.remove('hidden');
     overlay.classList.add('flex');
     overlay.setAttribute('aria-hidden', 'false');
@@ -101,6 +120,8 @@
     populateDemoUserList();
     setLoading(false);
     clearError();
+    var firstLogin = overlay.querySelector('.demo-user-login-btn');
+    if (firstLogin) firstLogin.focus();
   }
 
   function close() {
@@ -110,6 +131,7 @@
     overlay.classList.remove('flex');
     overlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') lastFocusedElement.focus();
   }
 
   function bind() {
@@ -154,8 +176,13 @@
       });
     });
 
+    document.addEventListener('click', function(e) {
+      if (!customCloseEnabled || !overlay || overlay.classList.contains('hidden')) return;
+      if (e.target.closest('.login-overlay-close') || e.target === overlay) close();
+    });
+
     document.addEventListener('keydown', function onEscape(e) {
-      if (e.key === 'Escape' && overlay && !overlay.classList.contains('hidden')) close();
+      if (customCloseEnabled && e.key === 'Escape' && overlay && !overlay.classList.contains('hidden')) close();
     });
   }
 
@@ -191,5 +218,5 @@
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  window.LoginOverlay = { open: open, close: close };
+  window.LoginOverlay = { open: open, close: close, setCustomCloseEnabled: setCustomCloseEnabled, canCustomClose: canCustomClose };
 })();

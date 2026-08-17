@@ -4,8 +4,8 @@
  */
 (function() {
   var overlay = null;
-  var modalInstance = null;
   var bound = false;
+  var lastFocusedElement = null;
 
   function getOverlay() {
     return document.getElementById('account-overlay');
@@ -47,7 +47,12 @@
     var cardNameEl = document.getElementById('account-profile-card-name');
     var expiryEl = document.getElementById('account-profile-expiry');
     var addressEl = document.getElementById('account-profile-address');
-    if (nameEl) nameEl.textContent = user && user.name ? user.name : '–';
+    var initialsEl = document.getElementById('account-profile-initials');
+    var demoUsers = typeof getDemoUsers === 'function' ? getDemoUsers() : [];
+    var demoMatch = user && demoUsers.find(function(item) { return item.externalId === user.externalId; });
+    var displayName = user && user.name ? user.name : (demoMatch && demoMatch.label ? demoMatch.label : 'Traveler');
+    if (initialsEl) initialsEl.textContent = displayName.split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) { return part.charAt(0); }).join('').toUpperCase() || 'TR';
+    if (nameEl) nameEl.textContent = displayName;
     if (phoneEl) phoneEl.textContent = user && user.phone ? user.phone : '–';
     if (emailEl) emailEl.textContent = user && user.email ? user.email : '–';
     if (passportEl) passportEl.textContent = user && user.passport ? user.passport : '–';
@@ -59,28 +64,27 @@
 
   function open() {
     overlay = getOverlay();
-    if (!overlay) return;
+    if (!overlay || !overlay.classList.contains('hidden')) return;
+    lastFocusedElement = document.activeElement;
     populateProfile();
-    if (!modalInstance && typeof Modal === 'function') {
-      modalInstance = new Modal(overlay, { closable: true });
-    }
-    if (modalInstance) modalInstance.show();
-    else overlay.classList.remove('hidden');
+    overlay.classList.remove('hidden');
+    requestAnimationFrame(function() { overlay.classList.add('is-open'); });
     overlay.setAttribute('aria-hidden', 'false');
     var trigger = getAccountLink();
     if (trigger) trigger.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
+    var closeButton = overlay.querySelector('.account-close');
+    if (closeButton) closeButton.focus();
   }
 
   function close() {
     overlay = overlay || getOverlay();
-    if (!overlay) return;
-    if (modalInstance) modalInstance.hide();
-    else overlay.classList.add('hidden');
+    if (!overlay || overlay.classList.contains('hidden')) return;
+    overlay.classList.remove('is-open');
     overlay.setAttribute('aria-hidden', 'true');
     var trigger = getAccountLink();
     if (trigger) trigger.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
+    window.setTimeout(function() { overlay.classList.add('hidden'); }, 280);
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') lastFocusedElement.focus();
   }
 
   function bind() {
@@ -99,6 +103,8 @@
 
     var closeBtn = overlay.querySelector('.account-close');
     if (closeBtn) closeBtn.addEventListener('click', close);
+    var backdrop = overlay.querySelector('.account-backdrop');
+    if (backdrop) backdrop.addEventListener('click', close);
 
   }
 

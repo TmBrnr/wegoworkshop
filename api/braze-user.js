@@ -6,7 +6,7 @@ module.exports = async function handler(req, res) {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Braze-Rest-Key, X-Braze-Rest-Endpoint');
 
   if (req.method === 'OPTIONS') {
     return res.status(204).end();
@@ -17,12 +17,27 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required query parameter: external_id' });
   }
 
-  var brazeApiKey = process.env.BRAZE_API_KEY;
-  var brazeRestEndpoint = process.env.BRAZE_REST_ENDPOINT;
+  var temporaryApiKey = req.headers['x-braze-rest-key'];
+  var temporaryRestEndpoint = req.headers['x-braze-rest-endpoint'];
+  var brazeApiKey = temporaryApiKey ? String(temporaryApiKey).trim() : process.env.BRAZE_API_KEY;
+  var brazeRestEndpoint = temporaryRestEndpoint ? String(temporaryRestEndpoint).trim() : process.env.BRAZE_REST_ENDPOINT;
+
+  if (temporaryRestEndpoint) {
+    try {
+      var restUrl = new URL(/^https?:\/\//i.test(brazeRestEndpoint) ? brazeRestEndpoint : 'https://' + brazeRestEndpoint);
+      if (!/(^|\.)braze\.(com|eu)$/i.test(restUrl.hostname)) {
+        return res.status(400).json({ error: 'REST endpoint must use a braze.com or braze.eu host' });
+      }
+      brazeRestEndpoint = restUrl.origin;
+    } catch (error) {
+      return res.status(400).json({ error: 'Invalid Braze REST endpoint' });
+    }
+  }
 
   if (!brazeApiKey || !brazeRestEndpoint) {
-    return res.status(500).json({
-      error: 'Missing BRAZE_API_KEY or BRAZE_REST_ENDPOINT environment variable'
+    return res.status(503).json({
+      error: 'Braze REST profile lookup is not configured',
+      code: 'BRAZE_PROFILE_LOOKUP_UNAVAILABLE'
     });
   }
 

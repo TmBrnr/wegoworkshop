@@ -50,6 +50,7 @@ const BAGGAGE_OPTIONS = [
     cancelFee: 100,
     changeFee: 250,
     freeChanges: 0,
+    price: 20,
   },
   {
     id: 'flex',
@@ -59,6 +60,7 @@ const BAGGAGE_OPTIONS = [
     cancelFee: 100,
     changeFee: 150,
     freeChanges: 1,
+    price: 38,
   },
   {
     id: 'premium',
@@ -68,21 +70,22 @@ const BAGGAGE_OPTIONS = [
     cancelFee: 100,
     changeFee: 100,
     freeChanges: 2,
+    price: 55,
   },
 ];
 
 const MEAL_OPTIONS = [
-  { id: 'normal', name: 'Normal Meal', icon: 'fa-solid fa-burger', description: 'Protein dish with vegetables and carbohydrates.' },
-  { id: 'vegetarian', name: 'Vegetarian', icon: 'fa-solid fa-leaf', description: 'Plant-based meal option' },
-  { id: 'gluten_free', name: 'Gluten Free', icon: 'fa-solid fa-wheat-awn-circle-exclamation', description: 'Gluten-free meal' },
-  { id: 'kosher_halal', name: 'Kosher / Halal', icon: 'fa-solid fa-mosque', description: 'Prepared to dietary requirements' },
+  { id: 'normal', name: 'Normal Meal', icon: 'fa-solid fa-burger', description: 'Protein dish with vegetables and carbohydrates.', price: 14 },
+  { id: 'vegetarian', name: 'Vegetarian', icon: 'fa-solid fa-leaf', description: 'Plant-based meal option', price: 14 },
+  { id: 'gluten_free', name: 'Gluten Free', icon: 'fa-solid fa-wheat-awn-circle-exclamation', description: 'Gluten-free meal', price: 16 },
+  { id: 'kosher_halal', name: 'Kosher / Halal', icon: 'fa-solid fa-mosque', description: 'Prepared to dietary requirements', price: 16 },
 ];
 
 const ANCILLARY_OPTIONS = [
-  { id: 'travel_insurance', name: 'Travel Insurance', icon: 'fa-solid fa-user-shield', description: 'Cover for trip cancellation and medical' },
-  { id: 'lounge_access', name: 'Lounge Access', icon: 'fa-solid fa-couch', description: 'Airport lounge access before your flight' },
-  { id: 'onboard_wifi', name: 'Onboard Internet', icon: 'fa-solid fa-wifi', description: 'Wi-Fi for the duration of your flight' },
-  { id: 'priority_service', name: 'Priority Service', icon: 'fa-solid fa-bell-concierge', description: 'Priority boarding and baggage' },
+  { id: 'travel_insurance', name: 'Travel Insurance', icon: 'fa-solid fa-user-shield', description: 'Cover for trip cancellation and medical', price: 24 },
+  { id: 'lounge_access', name: 'Lounge Access', icon: 'fa-solid fa-couch', description: 'Airport lounge access before your flight', price: 35 },
+  { id: 'onboard_wifi', name: 'Onboard Internet', icon: 'fa-solid fa-wifi', description: 'Wi-Fi for the duration of your flight', price: 12 },
+  { id: 'priority_service', name: 'Priority Service', icon: 'fa-solid fa-bell-concierge', description: 'Priority boarding and baggage', price: 18 },
 ];
 
 /**

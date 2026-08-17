@@ -1,34 +1,44 @@
-<section id="ux_promo_feed" class="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-10 md:grid-cols-2 xl:grid-cols-4" aria-label="Promotions">
-  <article id="ux_promo_feed_0" class="promo-block overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-    <div class="promo-image" role="img" aria-label="Promo"><img src="media/promo_singapore.jpg" alt="Promo Singapore" class="h-44 w-full object-cover"></div>
-    <div class="promo-body p-5">
-      <h2 class="promo-title mb-2 text-lg font-semibold text-gray-900">Flights to Singapore</h2>
-      <p class="promo-description mb-4 text-sm text-gray-600">Explore the Lion City with great fares from across the region.</p>
-      <a href="index.html?from=KUL&to=SIN" class="learn-more inline-flex items-center text-sm font-medium text-primary-600 hover:underline">Learn more</a>
-    </div>
-  </article>
-  <article id="ux_promo_feed_1" class="promo-block overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-    <div class="promo-image" role="img" aria-label="Promo"><img src="media/promo_bangkok.jpg" alt="Promo Bangkok" class="h-44 w-full object-cover"></div>
-    <div class="promo-body p-5">
-      <h2 class="promo-title mb-2 text-lg font-semibold text-gray-900">Discover Bangkok</h2>
-      <p class="promo-description mb-4 text-sm text-gray-600">Save on flights to Thailand's capital and beyond.</p>
-      <a href="index.html?from=SIN&to=BKK" class="learn-more inline-flex items-center text-sm font-medium text-primary-600 hover:underline">Learn more</a>
-    </div>
-  </article>
-  <article id="ux_promo_feed_2" class="promo-block overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-    <div class="promo-image" role="img" aria-label="Promo"><img src="media/promo_beach.jpg" alt="Promo beach" class="h-44 w-full object-cover"></div>
-    <div class="promo-body p-5">
-      <h2 class="promo-title mb-2 text-lg font-semibold text-gray-900">Beach getaways</h2>
-      <p class="promo-description mb-4 text-sm text-gray-600">Cebu, Phuket and more – find your next beach escape.</p>
-      <a href="index.html?from=CGK&to=CEB" class="learn-more inline-flex items-center text-sm font-medium text-primary-600 hover:underline">Learn more</a>
-    </div>
-  </article>
-  <article id="ux_promo_feed_3" class="promo-block overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-    <div class="promo-image" role="img" aria-label="Promo"><img src="media/promo_vietnam.jpg" alt="Promo Vietnam" class="h-44 w-full object-cover"></div>
-    <div class="promo-body p-5">
-      <h2 class="promo-title mb-2 text-lg font-semibold text-gray-900">Vietnam deals</h2>
-      <p class="promo-description mb-4 text-sm text-gray-600">Hanoi, Ho Chi Minh City and Da Nang from major hubs.</p>
-      <a href="index.html?from=KUL&to=SGN" class="learn-more inline-flex items-center text-sm font-medium text-primary-600 hover:underline">Learn more</a>
-    </div>
-  </article>
+<section id="ux_promo_feed" class="destination-section" aria-label="Cebu Pacific destinations and offers">
+  <div class="destination-orbits" aria-label="Popular destinations">
+    <a href="index.html?from=CEB&to=CRK"><img src="media/promo_bangkok.jpg" alt="Hot air balloon over Clark"><span>Clark</span></a>
+    <a href="index.html?from=CGK&to=CEB"><img src="media/promo_beach.jpg" alt="Cebu tropical coast"><span>Cebu</span></a>
+    <a href="index.html?from=CEB&to=ILO"><img src="media/hero_iloilo.png" alt="Iloilo island coast"><span>Iloilo</span></a>
+    <a href="index.html?from=CEB&to=DVO"><img src="media/promo_vietnam.jpg" alt="Davao highlands"><span>Davao</span></a>
+  </div>
 </section>
+
+<section id="airline-story" class="airline-story">
+  <div class="story-copy"><h2>Why Everyone Flies</h2><p>Cebu Pacific operates the widest network in the Philippines, offering flights to Manila, Cebu, Davao, Iloilo, Clark, and more. With flexible bookings, low fares, and global best safety practices, every Juan can travel with confidence.</p></div>
+  <div class="story-art" aria-hidden="true"><i class="fa-solid fa-person-walking-luggage"></i><span class="story-sun"><i class="fa-solid fa-umbrella-beach"></i></span><span class="story-sun"><i class="fa-solid fa-plane"></i></span><span class="story-sun"><i class="fa-solid fa-mountain-sun"></i></span></div>
+</section>
+
+<nav class="quick-services" aria-label="Travel services">
+  <a href="#flight-search"><i class="fa-solid fa-circle-check"></i><span>Check In</span></a>
+  <a href="#ux_promo_feed"><i class="fa-solid fa-ticket"></i><span>CEB Super Pass</span></a>
+  <a href="#flight-search"><i class="fa-solid fa-plane-up"></i><span>Flight Status</span></a>
+  <a href="#flight-search"><i class="fa-solid fa-file-pen"></i><span>Manage Booking</span></a>
+</nav>
+
+<section class="cheap-flights" aria-labelledby="cheap-flights-title">
+  <h2 id="cheap-flights-title">Book cheap flights from</h2>
+  <div class="fare-tabs" role="tablist" aria-label="Departure city"><button type="button" class="active">Manila</button><button type="button">Cebu</button><button type="button">Davao</button><button type="button">Clark</button></div>
+  <div class="deal-grid">
+    <article id="ux_promo_feed_0" class="promo-block promo-feature"><img src="media/promo_beach.jpg" alt="Tropical Cebu coast" class="promo-image"><div class="promo-body"><span>For as low as</span><strong>₱188*</strong><h3 class="promo-title">Cebu</h3><a href="index.html?from=MNL&to=CEB" class="learn-more">Search fare</a></div></article>
+    <article id="ux_promo_feed_1" class="promo-block"><img src="media/hero_iloilo.png" alt="Iloilo island" class="promo-image"><div class="promo-body"><span>For as low as</span><strong>₱288*</strong><h3 class="promo-title">Iloilo</h3><a href="index.html?from=MNL&to=ILO" class="learn-more">Search fare</a></div></article>
+    <article id="ux_promo_feed_2" class="promo-block"><img src="media/promo_vietnam.jpg" alt="Da Nang landscape" class="promo-image"><div class="promo-body"><span>For as low as</span><strong>₱1,900*</strong><h3 class="promo-title">Da Nang</h3><a href="index.html?from=MNL&to=DAD" class="learn-more">Search fare</a></div></article>
+    <article id="ux_promo_feed_3" class="promo-block"><img src="media/promo_singapore.jpg" alt="Singapore waterfront" class="promo-image"><div class="promo-body"><span>For as low as</span><strong>₱888*</strong><h3 class="promo-title">Singapore</h3><a href="index.html?from=MNL&to=SIN" class="learn-more">Search fare</a></div></article>
+  </div>
+  <p class="fare-note">*One-way base fares</p><a class="see-more-fares" href="#flight-search">See more</a>
+</section>
+
+<section class="latest-stories" aria-labelledby="latest-stories-title">
+  <div class="stories-heading"><h2 id="latest-stories-title">Latest Stories</h2><a href="#latest-stories-title">View all articles</a></div>
+  <div class="stories-grid"><article class="story-feature"><img src="media/hero_sea.jpg" alt="Cebu Pacific aircraft flying over the sea"><div><span>Press Release</span><h3>Cebu Pacific receives new aircraft delivery</h3><p>The airline continues to expand its fleet and connect more everyJuan.</p></div></article><article><img src="media/promo_bangkok.jpg" alt="Colorful city journey"><span>Discover With Us</span><h3>Dream destinations for your next trip</h3></article><article><img src="media/promo_beach.jpg" alt="Clear blue tropical water"><span>Discover With Us</span><h3>Experience more islands for less</h3></article></div>
+</section>
+
+<footer class="airline-footer">
+  <div class="footer-main"><div><strong>Download the Cebu Pacific app</strong><div class="app-badges"><span><i class="fa-brands fa-apple"></i> App Store</span><span><i class="fa-brands fa-google-play"></i> Google Play</span></div></div><div><strong>Connect with us</strong><div class="social-links"><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a><a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a></div></div></div>
+  <div class="footer-links"><a href="#flight-search">Book</a><a href="#flight-search">Manage</a><a href="#ux_promo_feed">Travel Info</a><a href="#latest-stories-title">Explore</a><a href="#airline-story">About</a></div>
+  <div class="footer-country"><span>🇵🇭 Philippines</span><i class="fa-solid fa-globe"></i></div>
+  <p>© Copyright 2026 Cebu Pacific</p>
+</footer>

@@ -6,7 +6,7 @@
 (function (global) {
   'use strict';
 
-  var MAX_EVENTS_STORED = 10;
+  var MAX_EVENTS_STORED = 25;
   var localAttributes = {};
   var localEvents = [];
   var contentCardsSubscriptions = [];
@@ -16,6 +16,7 @@
   var lastExternalId = '';
   var cachedDeviceId = null;
 
+  var CONFIG_STORAGE_KEY = 'braze_sdk_config';
   var DEFAULT_CONFIG = {
     apiKey: '91530c80-6e0b-4f8d-84c1-0d3d6b174451',
     options: {
@@ -25,6 +26,51 @@
       automaticallyShowInAppMessages: true
     }
   };
+
+  function getStoredConfig() {
+    try {
+      var raw = global.localStorage.getItem(CONFIG_STORAGE_KEY);
+      var parsed = raw ? JSON.parse(raw) : null;
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function getRuntimeConfig() {
+    var env = global.__ENV__ || global.__BRAZE_CONFIG__ || {};
+    return {
+      apiKey: env.NEXT_PUBLIC_BRAZE_SDK_KEY || env.BRAZE_SDK_KEY || env.apiKey || '',
+      baseUrl: env.NEXT_PUBLIC_BRAZE_SDK_ENDPOINT || env.BRAZE_SDK_ENDPOINT || env.baseUrl || ''
+    };
+  }
+
+  function getConfig() {
+    var stored = getStoredConfig() || {};
+    var runtime = getRuntimeConfig();
+    var apiKey = stored.apiKey || runtime.apiKey || DEFAULT_CONFIG.apiKey;
+    var baseUrl = stored.baseUrl || runtime.baseUrl || DEFAULT_CONFIG.options.baseUrl;
+    return {
+      apiKey: apiKey,
+      baseUrl: baseUrl,
+      source: stored.apiKey || stored.baseUrl ? 'debug override' : (runtime.apiKey || runtime.baseUrl ? 'runtime environment' : 'built-in default'),
+      options: Object.assign({}, DEFAULT_CONFIG.options, { baseUrl: baseUrl })
+    };
+  }
+
+  function setConfig(config) {
+    var value = {
+      apiKey: config && config.apiKey ? String(config.apiKey).trim() : '',
+      baseUrl: config && config.baseUrl ? String(config.baseUrl).trim().replace(/^https?:\/\//, '').replace(/\/$/, '') : ''
+    };
+    global.localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(value));
+    return value;
+  }
+
+  function clearConfig() {
+    global.localStorage.removeItem(CONFIG_STORAGE_KEY);
+    return getConfig();
+  }
 
   function getBraze() {
     if (sdk) return sdk;
@@ -45,8 +91,9 @@
       window.AppLogger.warn('[SDK]', 'Braze2: SDK not loaded. Include the Braze Web SDK script before braze2.js.');
       return false;
     }
-    var key = apiKey != null ? apiKey : DEFAULT_CONFIG.apiKey;
-    var opts = options != null ? options : DEFAULT_CONFIG.options;
+    var resolvedConfig = getConfig();
+    var key = apiKey != null ? apiKey : resolvedConfig.apiKey;
+    var opts = options != null ? options : resolvedConfig.options;
     if (!opts.baseUrl && key) {
       window.AppLogger.warn('[SDK]', 'Braze2: baseUrl is required in options (e.g. sdk.iad-05.braze.com).');
     }
@@ -136,6 +183,25 @@
    * @param {string} key - Attribute key.
    * @param {*} value - Attribute value (string, number, boolean, or array of strings).
    */
+  function updateStandardProfile(profile) {
+    var braze = getBraze();
+    var user = braze && typeof braze.getUser === 'function' ? braze.getUser() : null;
+    profile = profile || {};
+    if (user) {
+      try {
+        if (profile.firstName && typeof user.setFirstName === 'function') user.setFirstName(profile.firstName);
+        if (profile.lastName && typeof user.setLastName === 'function') user.setLastName(profile.lastName);
+        if (profile.email && typeof user.setEmail === 'function') user.setEmail(profile.email);
+        if (profile.phone && typeof user.setPhoneNumber === 'function') user.setPhoneNumber(profile.phone);
+      } catch (e) {
+        window.AppLogger.warn('[SDK]', 'Braze2: standard profile update failed', e);
+      }
+    }
+    ['firstName', 'lastName', 'email', 'phone'].forEach(function (key) {
+      if (profile[key]) localAttributes[key] = profile[key];
+    });
+  }
+
   function updateUserAttribute(key, value) {
     var braze = getBraze();
     if (braze && typeof braze.User !== 'undefined' && typeof braze.User.setCustomUserAttribute === 'function') {
@@ -243,11 +309,15 @@
     changeUser: changeUser,
     trackEvent: trackEvent,
     updateUserAttribute: updateUserAttribute,
+    updateStandardProfile: updateStandardProfile,
     getUserProfile: getUserProfile,
     subscribeToContentCardsUpdates: subscribeToContentCardsUpdates,
     subscribeToBannersUpdates: subscribeToBannersUpdates,
     getDeviceId: getDeviceId,
     getBraze: getBraze,
+    getConfig: getConfig,
+    setConfig: setConfig,
+    clearConfig: clearConfig,
     isInitialized: function () { return isInitialized; }
   };
 

@@ -8,14 +8,8 @@
   var KEY_ANON_USER = 'anon_user';
 
   var DEMO_USERS = [
-    { externalId: 'wego9999', label: 'Auzani Test User' },
-    { externalId: 'wego_rintu_testuser_001', label: 'Rintu Test User' },
-    { externalId: 'wego_yangla_testuser_001', label: 'Yangla Test User' },
-    { externalId: 'wego_harshita_testuser_001', label: 'Harshita Test User' },
-    { externalId: 'wego_suganya_testuser_001', label: 'Suganya Test User' },
-    { externalId: 'wego_yogesh_testuser_001', label: 'Yogesh Test User' },
-    { externalId: 'wego_sharath_testuser_001', label: 'Sharath Test User' },
-    { externalId: 'wego_sourav_testuser_001', label: 'Sourav Test User' }
+    { externalId: 'cb-01', label: 'Cebu Pacific Traveler 01' },
+    { externalId: 'cb-02', label: 'Cebu Pacific Traveler 02' }
   ];
 
   var DEFAULT_USER_PROFILE = {
@@ -85,6 +79,49 @@
     }
   }
 
+  var REST_CONFIG_SESSION_KEY = 'wego_braze_rest_config';
+  var temporaryRestConfig = { apiKey: '', endpoint: '' };
+
+  try {
+    var savedRestConfig = JSON.parse(window.sessionStorage.getItem(REST_CONFIG_SESSION_KEY) || 'null');
+    if (savedRestConfig) {
+      temporaryRestConfig.apiKey = savedRestConfig.apiKey ? String(savedRestConfig.apiKey) : '';
+      temporaryRestConfig.endpoint = savedRestConfig.endpoint ? String(savedRestConfig.endpoint) : '';
+    }
+  } catch (e) {
+    window.AppLogger.warn('[AUTH]', 'Could not restore temporary Braze REST config', e);
+  }
+
+  function setTemporaryRestConfig(config) {
+    temporaryRestConfig.apiKey = config && config.apiKey ? String(config.apiKey).trim() : '';
+    temporaryRestConfig.endpoint = config && config.endpoint ? String(config.endpoint).trim().replace(/\/$/, '') : '';
+    try {
+      window.sessionStorage.setItem(REST_CONFIG_SESSION_KEY, JSON.stringify(temporaryRestConfig));
+    } catch (e) {
+      window.AppLogger.warn('[AUTH]', 'Could not retain temporary Braze REST config', e);
+    }
+    return getTemporaryRestConfig();
+  }
+
+  function getTemporaryRestConfig() {
+    return {
+      apiKey: temporaryRestConfig.apiKey,
+      endpoint: temporaryRestConfig.endpoint,
+      configured: Boolean(temporaryRestConfig.apiKey && temporaryRestConfig.endpoint)
+    };
+  }
+
+  function clearTemporaryRestConfig() {
+    temporaryRestConfig.apiKey = '';
+    temporaryRestConfig.endpoint = '';
+    try {
+      window.sessionStorage.removeItem(REST_CONFIG_SESSION_KEY);
+    } catch (e) {
+      window.AppLogger.warn('[AUTH]', 'Could not clear temporary Braze REST config', e);
+    }
+    return getTemporaryRestConfig();
+  }
+
   function fetchBrazeProfile(externalId, callback) {
     var id = externalId != null ? String(externalId).trim() : '';
     if (!id) {
@@ -92,13 +129,22 @@
       return;
     }
 
+    var requestHeaders = { Accept: 'application/json' };
+    if (temporaryRestConfig.apiKey && temporaryRestConfig.endpoint) {
+      requestHeaders['X-Braze-Rest-Key'] = temporaryRestConfig.apiKey;
+      requestHeaders['X-Braze-Rest-Endpoint'] = temporaryRestConfig.endpoint;
+    }
+
     fetch('/api/braze-user?external_id=' + encodeURIComponent(id), {
       method: 'GET',
-      headers: { Accept: 'application/json' }
+      headers: requestHeaders
     })
       .then(function (res) {
         if (!res.ok) {
           return res.json().catch(function () { return {}; }).then(function (data) {
+            if (res.status === 503 && data && data.code === 'BRAZE_PROFILE_LOOKUP_UNAVAILABLE') {
+              return { profileLookupUnavailable: true };
+            }
             var msg = data && data.error ? data.error : 'Unable to load Braze user profile';
             throw new Error(msg);
           });
@@ -164,7 +210,7 @@
           window.BrazePanel.addEvent('logged-in', { externalId: user.externalId, deviceId: user.deviceId });
         }
 
-        if (typeof callback === 'function') callback(err, user);
+        if (typeof callback === 'function') callback(null, user, err || null);
         resolve(user);
       });
     });
@@ -208,6 +254,11 @@
   window.getDemoUser = getDemoUser;
   window.getCurrentUser = getCurrentUser;
   window.fetchBrazeProfile = fetchBrazeProfile;
+  window.BrazeRestDebug = {
+    setConfig: setTemporaryRestConfig,
+    getConfig: getTemporaryRestConfig,
+    clearConfig: clearTemporaryRestConfig
+  };
   window.loginAsDemo = loginAsDemo;
   window.setLoggedIn = setLoggedIn;
   window.logout = logout;

@@ -4,6 +4,8 @@
   "description": "A static travel booking **single-page application (SPA)** for demonstrating **Braze Web SDK** integrations. Users can search for flights (Southeast Asia), view results, and complete a booking flow: baggage, seats, meals, ancillaries, passenger info, review, and payment.",
   "main": "smoke-test.js",
   "scripts": {
+    "dev": "serve . -l 3000",
+    "start": "serve . -l 3000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,5 +23,8 @@
   "dependencies": {
     "ky": "^1.14.3",
     "playwright": "^1.58.2"
+  },
+  "devDependencies": {
+    "serve": "^14.2.6"
   }
 }

@@ -1,118 +1,55 @@
-<header id="ux_header" class="sticky top-0 z-40 border-b border-gray-200 bg-white">
-  <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-6" id="ux_header_nav">
-    <a href="index.html" class="flex items-center">
-      <img src="media/logo.png" alt="Wego" width="70">
+<header id="ux_header" class="airline-header">
+  <div class="travel-advisory">
+    <div class="advisory-message"><span><i class="fa-solid fa-circle-info"></i> <strong>Travel Advisory:</strong> Integration of AirSWIFT into Cebgo Operations</span><a href="#ux_promo_feed"><i class="fa-solid fa-chevron-left"></i><i class="fa-solid fa-chevron-right"></i><strong>View all</strong></a></div>
+    <div class="top-utilities"><span>PHP <i class="fa-solid fa-chevron-down"></i></span><span><i class="fa-solid fa-globe"></i> English <i class="fa-solid fa-chevron-down"></i></span><strong>Help</strong></div>
+  </div>
+  <nav class="airline-nav" id="ux_header_nav" aria-label="Main navigation">
+    <a href="index.html" class="airline-brand" aria-label="Cebu Pacific home">
+      <img src="https://cdn.media.amplience.net/i/cebupacificair/CEB_logo_Noto_Sans_Linear_White?fmt=auto&amp;maxW=1920&amp;maxH=1920&amp;w=206&amp;h=67&amp;sm=c&amp;&amp;poi={$this.metadata.pointOfInterest.x},{$this.metadata.pointOfInterest.y},{$this.metadata.pointOfInterest.w},{$this.metadata.pointOfInterest.h}" width="206" height="67" alt="Cebu Pacific">
     </a>
-    <div class="flex items-center gap-4 text-sm">
-      <a id="ux_notifications" href="#" role="button" aria-expanded="false" aria-haspopup="true"
-        aria-controls="ux_notifications_overlay" aria-label="Notifications"
-        class="relative text-gray-700 transition hover:text-primary-600">
-        <i class="fa-regular fa-message text-lg"></i>
-        <span id="ux_notifications_count"
-          class="absolute -right-2 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-primary-600 px-1.5 text-xs font-bold text-white">4</span>
-      </a>
-      <a id="ux_account" href="#" role="button" aria-expanded="false" aria-haspopup="true" aria-controls="account-overlay"
-        aria-label="Account" class="header-account-hidden text-gray-700 transition hover:text-primary-600">
-        <i class="fa-regular fa-circle-user text-lg"></i>
-      </a>
-      <a id="ux_login" href="#" class="font-medium text-gray-700 transition hover:text-primary-600">Login</a>
-      <a id="ux_reset" href="index.html" class="text-gray-500 transition hover:text-primary-600">Reset</a>
-      <a id="ux_braze" href="#" role="button" aria-expanded="false" aria-controls="braze-panel"
-        aria-label="Braze debug panel" class="font-medium text-gray-700 transition hover:text-primary-600">Braze</a>
+    <div class="primary-nav-links">
+      <a href="#flight-search">Book</a><a href="#view-booking">Manage</a><a href="#ux_promo_feed">Travel Info</a><a href="#ux_promo_feed">Explore</a><a href="#airline-story">About</a>
+    </div>
+    <div class="header-utilities">
+      <a id="ux_notifications" href="#" role="button" aria-expanded="false" aria-haspopup="true" aria-controls="ux_notifications_overlay" aria-label="Notifications" class="header-icon utility-notification"><i class="fa-regular fa-bell"></i><span id="ux_notifications_count">4</span></a>
+      <a id="ux_account" href="#" role="button" aria-expanded="false" aria-haspopup="true" aria-controls="account-overlay" aria-label="Account" class="header-account-hidden header-icon"><i class="fa-regular fa-circle-user"></i></a>
+      <a id="ux_login" href="#" class="login-link"><i class="fa-solid fa-circle-user"></i> Log in</a>
+      <button type="button" class="search-trigger" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <button type="button" id="ux_braze" class="debug-menu-trigger" aria-expanded="false" aria-controls="braze-panel"><i class="fa-solid fa-bug"></i><span>Debug</span></button>
+      <div class="utility-menu"><button type="button" aria-label="Open tools"><i class="fa-solid fa-bars"></i></button><div class="utility-dropdown"><a id="ux_reset" href="index.html">Reset demo</a></div></div>
     </div>
   </nav>
 
-  <div id="ux_notifications_overlay" aria-hidden="true"
-    class="fixed right-0 top-0 z-50 h-screen w-80 translate-x-full overflow-y-auto border-l border-gray-200 bg-white p-4 transition-transform">
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-lg font-semibold text-gray-900">Notifications</h2>
-      <button type="button" class="notifications-close rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-        aria-label="Close notifications"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-    <ul class="notifications-list space-y-3" aria-label="Notification messages (loaded from storage)"></ul>
+  <div id="ux_notifications_overlay" aria-hidden="true" class="side-panel notifications-panel translate-x-full">
+    <div class="panel-header"><h2>Notifications</h2><button type="button" class="notifications-close" aria-label="Close notifications"><i class="fa-solid fa-xmark"></i></button></div>
+    <ul class="notifications-list" aria-label="Notification messages (loaded from storage)"></ul>
   </div>
-  <div class="notifications-backdrop fixed inset-0 z-40 hidden bg-gray-900/50"></div>
+  <div class="notifications-backdrop panel-backdrop hidden"></div>
 
   <div id="ux_container_login_overlay">
-    <div id="login-overlay" tabindex="-1" aria-hidden="true"
-      class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden md:inset-0">
-      <div class="relative max-h-full w-full max-w-md p-4">
-        <div class="relative rounded-lg bg-white shadow">
-          <div class="p-6">
-            <h2 id="login-title" class="mb-2 text-xl font-semibold text-gray-900">Login required</h2>
-            <p class="mb-4 text-sm text-gray-600">Select a demo user to sign in.</p>
-            <div id="demo-user-list" class="mb-4 space-y-2">
-              <!-- Populated dynamically by login-overlay.js -->
-            </div>
-            <p id="demo-user-loading" class="hidden text-xs text-gray-500">Signing in and loading Braze profile...</p>
-            <p id="demo-user-error" class="mt-2 hidden text-xs text-red-600"></p>
-          </div>
-        </div>
-      </div>
+    <div id="login-overlay" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="login-title" aria-describedby="login-description" aria-hidden="true" class="modal-shell login-shell hidden">
+      <div class="modal-card login-card"><button type="button" class="login-overlay-close" aria-label="Close login screen"><i class="fa-solid fa-xmark"></i></button><div class="login-brand-mark" aria-hidden="true"><i class="fa-solid fa-plane-departure"></i></div><p class="login-kicker">Cebu Pacific traveler access</p><h2 id="login-title">Welcome aboard</h2><p id="login-description" class="login-description">Choose a demo traveler to continue to their saved profile and personalized Braze experience.</p><div id="demo-user-list" class="demo-user-list"></div><p id="demo-user-loading" class="login-status hidden" role="status"><i class="fa-solid fa-circle-notch fa-spin" aria-hidden="true"></i> Signing in and loading Braze profile...</p><p id="demo-user-error" class="login-error hidden" role="alert"></p><p class="login-privacy"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Demo access only. No password is required.</p></div>
     </div>
   </div>
 
-  <div id="account-overlay" tabindex="-1" aria-hidden="true"
-    class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden md:inset-0">
-    <div class="relative max-h-full w-full max-w-md p-4">
-      <div class="relative rounded-lg bg-white shadow">
-        <div class="flex items-center justify-between border-b border-gray-200 p-4">
-          <h2 id="account-title" class="text-xl font-semibold text-gray-900">Account</h2>
-          <button type="button" class="account-close rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-            aria-label="Close account"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <div class="space-y-3 p-4 text-sm">
-          <p><strong class="block text-xs uppercase tracking-wide text-gray-500">Name</strong><span id="account-profile-name">–</span></p>
-          <p><strong class="block text-xs uppercase tracking-wide text-gray-500">Phone</strong><span id="account-profile-phone">–</span></p>
-          <p><strong class="block text-xs uppercase tracking-wide text-gray-500">Email</strong><span id="account-profile-email">–</span></p>
-          <p><strong class="block text-xs uppercase tracking-wide text-gray-500">Passport</strong><span id="account-profile-passport">–</span></p>
-          <p><strong class="block text-xs uppercase tracking-wide text-gray-500">Card number</strong><span id="account-profile-card-number">–</span></p>
-          <p><strong class="block text-xs uppercase tracking-wide text-gray-500">Name on card</strong><span id="account-profile-card-name">–</span></p>
-          <p><strong class="block text-xs uppercase tracking-wide text-gray-500">Expiry</strong><span id="account-profile-expiry">–</span></p>
-          <p><strong class="block text-xs uppercase tracking-wide text-gray-500">Billing address</strong><span id="account-profile-address">–</span></p>
-          <button type="button" id="account-logout-btn"
-            class="mt-2 w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100">Logout</button>
-        </div>
+  <div id="account-overlay" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="account-title" aria-hidden="true" class="account-shell hidden">
+    <button type="button" class="account-backdrop" aria-label="Close account"></button>
+    <aside class="account-drawer" aria-label="Account details">
+      <div class="account-hero"><button type="button" class="account-close" aria-label="Close account"><i class="fa-solid fa-xmark"></i></button><div id="account-profile-initials" class="account-avatar" aria-hidden="true">TR</div><div><p class="account-eyebrow">My account</p><h2 id="account-title">Traveler profile</h2><p>Saved details for a smoother journey.</p></div></div>
+      <div class="account-content">
+        <section class="account-section" aria-labelledby="account-personal-heading"><h3 id="account-personal-heading"><i class="fa-regular fa-user"></i> Personal details</h3><dl><div><dt>Name</dt><dd id="account-profile-name">–</dd></div><div><dt>Phone</dt><dd id="account-profile-phone">–</dd></div><div><dt>Email</dt><dd id="account-profile-email">–</dd></div></dl></section>
+        <section class="account-section" aria-labelledby="account-travel-heading"><h3 id="account-travel-heading"><i class="fa-solid fa-passport"></i> Travel document</h3><dl><div><dt>Passport</dt><dd id="account-profile-passport">–</dd></div></dl></section>
+        <section class="account-section" aria-labelledby="account-payment-heading"><h3 id="account-payment-heading"><i class="fa-regular fa-credit-card"></i> Payment details</h3><dl><div><dt>Card number</dt><dd id="account-profile-card-number">–</dd></div><div><dt>Name on card</dt><dd id="account-profile-card-name">–</dd></div><div><dt>Expiry</dt><dd id="account-profile-expiry">–</dd></div><div><dt>Billing address</dt><dd id="account-profile-address">–</dd></div></dl></section>
       </div>
-    </div>
+      <div class="account-actions"><button type="button" id="account-logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</button><p>You can sign in again with another demo traveler.</p></div>
+    </aside>
   </div>
 
-  <div id="braze-panel-overlay" aria-hidden="true"
-    class="fixed left-0 top-0 z-50 h-screen w-96 max-w-full -translate-x-full overflow-y-auto border-r border-gray-200 bg-white p-4 transition-transform">
-    <div id="braze-panel" role="dialog" aria-modal="true" aria-labelledby="braze-panel-title" class="h-full">
-      <div class="mb-4 flex items-center justify-between">
-        <h2 id="braze-panel-title" class="text-lg font-semibold text-gray-900">Braze</h2>
-        <button type="button" class="braze-panel-close rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-          aria-label="Close Braze panel"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="space-y-6">
-        <section>
-          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">User Profile</h3>
-          <dl class="space-y-2 text-sm">
-            <dt class="text-gray-500">External ID</dt>
-            <dd id="braze-profile-external-id" class="text-gray-900">–</dd>
-            <dt class="text-gray-500">Device ID</dt>
-            <dd id="braze-profile-braze-id" class="text-gray-900">–</dd>
-            <dt class="text-gray-500">Name</dt>
-            <dd id="braze-profile-name" class="text-gray-900">–</dd>
-            <dt class="text-gray-500">Email</dt>
-            <dd id="braze-profile-email" class="text-gray-900">–</dd>
-            <dt class="text-gray-500">Phone</dt>
-            <dd id="braze-profile-phone" class="text-gray-900">–</dd>
-          </dl>
-        </section>
-        <section>
-          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Attributes</h3>
-          <dl id="braze-attr-list" class="space-y-2 text-sm">
-            <!-- Dynamically populated -->
-          </dl>
-        </section>
-        <section>
-          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">Events</h3>
-          <ul id="braze-events-list" class="space-y-3" aria-label="Braze events"></ul>
-        </section>
-      </div>
+  <div id="braze-panel-overlay" aria-hidden="true" class="side-panel braze-side-panel -translate-x-full">
+    <div id="braze-panel" role="dialog" aria-modal="true" aria-labelledby="braze-panel-title">
+      <div class="panel-header"><h2 id="braze-panel-title">Braze</h2><button type="button" class="braze-panel-close" aria-label="Close Braze panel"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="braze-sections"><section class="braze-debug-section"><h3>SDK settings</h3><div class="braze-sdk-settings"><label for="braze-debug-sdk-key">SDK key</label><input type="text" id="braze-debug-sdk-key" autocomplete="off" spellcheck="false"><label for="braze-debug-sdk-endpoint">SDK endpoint</label><input type="text" id="braze-debug-sdk-endpoint" autocomplete="off" spellcheck="false" placeholder="sdk.iad-03.braze.com"><p id="braze-debug-config-source" class="braze-debug-help"></p><div class="braze-debug-actions braze-config-actions"><button type="button" id="braze-debug-save-config">Apply &amp; reload</button><button type="button" id="braze-debug-reset-config">Use environment/defaults</button></div></div><h3>REST profile lookup</h3><div class="braze-sdk-settings"><label for="braze-debug-rest-key">REST API key</label><input type="password" id="braze-debug-rest-key" autocomplete="off" spellcheck="false"><label for="braze-debug-rest-endpoint">REST endpoint</label><input type="text" id="braze-debug-rest-endpoint" autocomplete="off" spellcheck="false" placeholder="https://rest.iad-03.braze.com"><p id="braze-debug-rest-status" class="braze-debug-help">Not configured. Credentials are retained only for this tab session.</p><div class="braze-debug-actions braze-config-actions"><button type="button" id="braze-debug-apply-rest-config">Use for this page</button><button type="button" id="braze-debug-clear-rest-config">Clear temporary credentials</button></div></div><h3>Debug menu</h3><div class="braze-debug-actions"><button type="button" id="braze-debug-open-login">Open login screen</button><button type="button" id="braze-debug-close-login">Close login screen</button><button type="button" id="braze-debug-log-event">Log debug event</button></div><label class="braze-debug-toggle"><input type="checkbox" id="braze-debug-custom-close" checked><span>Allow custom login closing</span></label><p class="braze-debug-help">Controls the close button, backdrop click, and Escape key on the login screen.</p></section><section><h3>User Profile</h3><dl><dt>External ID</dt><dd id="braze-profile-external-id">–</dd><dt>Device ID</dt><dd id="braze-profile-braze-id">–</dd><dt>Name</dt><dd id="braze-profile-name">–</dd><dt>Email</dt><dd id="braze-profile-email">–</dd><dt>Phone</dt><dd id="braze-profile-phone">–</dd></dl></section><section><h3>Attributes</h3><dl id="braze-attr-list"></dl></section><section><h3>Events</h3><ul id="braze-events-list" aria-label="Braze events"></ul></section></div>
     </div>
   </div>
-  <div class="braze-panel-backdrop fixed inset-0 z-40 hidden bg-gray-900/50"></div>
+  <div class="braze-panel-backdrop panel-backdrop hidden"></div>
 </header>
