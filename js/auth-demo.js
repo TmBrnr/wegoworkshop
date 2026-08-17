@@ -8,14 +8,8 @@
   var KEY_ANON_USER = 'anon_user';
 
   var DEMO_USERS = [
-    { externalId: 'wego9999', label: 'Auzani Test User' },
-    { externalId: 'wego_rintu_testuser_001', label: 'Rintu Test User' },
-    { externalId: 'wego_yangla_testuser_001', label: 'Yangla Test User' },
-    { externalId: 'wego_harshita_testuser_001', label: 'Harshita Test User' },
-    { externalId: 'wego_suganya_testuser_001', label: 'Suganya Test User' },
-    { externalId: 'wego_yogesh_testuser_001', label: 'Yogesh Test User' },
-    { externalId: 'wego_sharath_testuser_001', label: 'Sharath Test User' },
-    { externalId: 'wego_sourav_testuser_001', label: 'Sourav Test User' }
+    { externalId: 'cb-01', label: 'Cebu Pacific Traveler 01' },
+    { externalId: 'cb-02', label: 'Cebu Pacific Traveler 02' }
   ];
 
   var DEFAULT_USER_PROFILE = {

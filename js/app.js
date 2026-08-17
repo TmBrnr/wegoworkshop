@@ -508,8 +508,10 @@
         setBookingState({ passengerName: name, passengerPhone: phone, passengerEmail: email, passengerPassport: passport || '' });
         var normalizedEmail = email.toLowerCase();
         var nameParts = name.split(/\s+/).filter(Boolean);
+        var loggedInUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+        var stitchedExternalId = loggedInUser && loggedInUser.externalId ? loggedInUser.externalId : 'guest_' + normalizedEmail;
         if (window.Braze2) {
-          window.Braze2.changeUser('guest_' + normalizedEmail);
+          window.Braze2.changeUser(stitchedExternalId);
           window.Braze2.updateStandardProfile({ firstName: nameParts[0] || name, lastName: nameParts.slice(1).join(' '), email: normalizedEmail, phone: phone });
           window.Braze2.updateUserAttribute('latest_journey_id', journeyId);
           window.Braze2.updateUserAttribute('latest_route', p.from + '-' + p.to);
