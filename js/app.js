@@ -7,9 +7,10 @@
   'use strict';
 
   var VIEW_IDS = ['view-home', 'view-results', 'view-booking', 'view-complete'];
-  var STEP_ORDER = ['passenger', 'baggage', 'seats', 'meals', 'others', 'review'];
+  var STEP_ORDER = ['passenger', 'baggage', 'seats', 'meals', 'others', 'review', 'payment'];
   var currentBookingStep = null;
   var viewedStages = {};
+  var paymentSubmitting = false;
   var journeyId = window.sessionStorage.getItem('wego_journey_id') || ('journey_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8));
   window.sessionStorage.setItem('wego_journey_id', journeyId);
   var recordLocator = window.sessionStorage.getItem('wego_record_locator') || ('W' + Math.random().toString(36).slice(2, 7).toUpperCase());
@@ -159,6 +160,11 @@
       var flight = flights[params.flightIndex] || flights[0];
       var categories = ['baggage', 'seats', 'meal', 'extras'].filter(function (category) { return category === 'baggage' ? !!params.baggage : category === 'seats' ? !!params.seats.length : category === 'meal' ? !!params.meal : !!params.ancillaries.length; });
       trackStageOnce('booking_summary', 'cart_page_view', Object.assign(routeContext(params), { base_fare: Number(flight.price), ancillary_total: ancillaryValue(params), total_value: Number(flight.price) + ancillaryValue(params), sale_value: Number(flight.price) + ancillaryValue(params), discount_value: 0, promo_code: 'none', qu: Number(params.passengers) || 1, ancillary_categories: categories, personalized_offer: categories.length > 0, line_item_ids: [params.baggage].concat(params.seats, params.meal, params.ancillaries).filter(Boolean), line_items_json: JSON.stringify({ baggage: params.baggage || null, seats: params.seats, meal: params.meal || null, extras: params.ancillaries }) }));
+    }
+    if (stepId === 'payment') {
+      var paymentFlights = generateMockFlights({ from: params.from, to: params.to, departDate: params.depart, returnDate: params.returnDate, class: params.flightClass, passengers: Number(params.passengers) || 1 });
+      var paymentFlight = paymentFlights[params.flightIndex] || paymentFlights[0];
+      trackStageOnce('payment', 'payment_page_view', Object.assign(routeContext(params), { base_fare: Number(paymentFlight.price), ancillary_total: ancillaryValue(params), total_value: Number(paymentFlight.price) + ancillaryValue(params), qu: Number(params.passengers) || 1 }));
     }
     if (window.BookingSteps && window.BookingSteps.setActiveStep) {
       window.BookingSteps.setActiveStep(stepId);
@@ -550,8 +556,8 @@
       document.getElementById('change-passenger').onclick = function (e) { e.preventDefault(); showBookingStep('passenger'); };
       document.getElementById('review-prev').onclick = function () { showBookingStep('others'); };
       document.getElementById('proceed-payment').onclick = function () {
-        trackJourneyEvent('checkout_started', Object.assign(routeContext(p), { ancillary_total: ancillaryValue(p), total_value: Number(flight.price) + ancillaryValue(p), payment_collected: false, checkout_type: 'payment_intent' }), true);
-        if (window.Toast) window.Toast.show('Demo journey complete — payment is intentionally not collected.', 'success');
+        trackJourneyEvent('checkout_started', Object.assign(routeContext(p), { ancillary_total: ancillaryValue(p), total_value: Number(flight.price) + ancillaryValue(p), payment_collected: false, checkout_type: 'mock_payment' }), true);
+        showBookingStep('payment');
       };
     }
 
@@ -566,10 +572,22 @@
       if (expiryEl && user && user.expiry) expiryEl.value = user.expiry;
       if (addressEl && user && user.address) addressEl.value = user.address;
 
+      var ccvEl = document.getElementById('ccv');
       var form = document.getElementById('payment-form');
+      var submitButton = form.querySelector('button[type="submit"]');
       var processingOverlay = document.getElementById('payment-processing-overlay');
       form.onsubmit = function (e) {
         e.preventDefault();
+        if (paymentSubmitting) return;
+        var cardDigits = String(cardNumberEl.value || '').replace(/\D/g, '');
+        var expiryValid = /^(0[1-9]|1[0-2])\/\d{2}$/.test(String(expiryEl.value || '').trim());
+        var ccvValid = /^\d{3,4}$/.test(String(ccvEl.value || '').trim());
+        if (cardDigits.length < 13 || !cardNameEl.value.trim() || !expiryValid || !addressEl.value.trim() || !ccvValid) {
+          if (window.Toast) window.Toast.show('Enter valid mock payment details to continue.', 'error');
+          return;
+        }
+        paymentSubmitting = true;
+        if (submitButton) submitButton.disabled = true;
         if (processingOverlay) {
           processingOverlay.classList.add('is-open');
           processingOverlay.classList.remove('hidden');
@@ -577,28 +595,29 @@
           document.body.style.overflow = 'hidden';
         }
         setTimeout(function () {
-          var bookingCode = generateBookingCode();
+          var bookingState = getBookingState();
+          var bookingCode = bookingState.bookingCode || recordLocator;
+          var lineItemIds = [p.baggage].concat(p.seats, p.meal, p.ancillaries).filter(Boolean);
           setBookingState({ bookingCode: bookingCode });
+          trackJourneyEvent('purchase', Object.assign(routeContext(p), { booking_reference: bookingCode, base_fare: Number(flight.price), ancillary_total: ancillaryValue(p), total_value: Number(flight.price) + ancillaryValue(p), sale_value: Number(flight.price) + ancillaryValue(p), qu: Number(p.passengers) || 1, line_item_ids: lineItemIds, booking_status: 'confirmed' }), true);
           if (window.Braze2) {
-            window.Braze2.trackEvent('booked-flight', { origin: p.from, destination: p.to, bookingCode: bookingCode });
-            window.Braze2.getBraze().requestContentCardsRefresh();
+            window.Braze2.updateUserAttribute('latest_booking_reference', bookingCode);
+            window.Braze2.updateUserAttribute('latest_booking_status', 'confirmed');
           }
-          if (window.BrazePanel) {
-            window.BrazePanel.addEvent('booked-flight', { origin: p.from, destination: p.to, bookingCode: bookingCode });
-          }
-
           if (processingOverlay) {
             processingOverlay.classList.remove('is-open');
             processingOverlay.classList.add('hidden');
             processingOverlay.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
           }
+          paymentSubmitting = false;
+          if (submitButton) submitButton.disabled = false;
           showView('view-complete');
           renderComplete();
-        }, 3000);
+        }, 1200);
       };
       document.getElementById('payment-prev').onclick = function () { showBookingStep('review'); };
-      document.getElementById('payment-cancel').onclick = function () { showView('view-home'); };
+      document.getElementById('payment-cancel').onclick = function () { showBookingStep('review'); };
     }
   }
 
@@ -663,9 +682,18 @@
 
   function renderComplete() {
     var params = getBookingState();
-    var bookingCode = params.bookingCode || generateBookingCode();
+    var bookingCode = params.bookingCode || recordLocator;
+    if (!params.bookingCode) setBookingState({ bookingCode: bookingCode });
     var el = document.getElementById('booking-code');
     if (el) el.textContent = bookingCode;
+    var bookingParams = getBookingParams();
+    var flights = generateMockFlights({ from: bookingParams.from, to: bookingParams.to, departDate: bookingParams.depart, returnDate: bookingParams.returnDate, class: bookingParams.flightClass, passengers: Number(bookingParams.passengers) || 1 });
+    var flight = flights[bookingParams.flightIndex] || flights[0];
+    var details = document.getElementById('confirmation-details');
+    if (details) details.textContent = bookingParams.from + ' → ' + bookingParams.to + ' · ' + (bookingParams.depart || 'Date pending') + ' · ' + bookingParams.passengers + ' traveler(s) · PHP ' + (Number(flight.price) + ancillaryValue(bookingParams)).toLocaleString();
+    currentBookingStep = 'confirmed';
+    if (window.BookingSteps && window.BookingSteps.setActiveStep) window.BookingSteps.setActiveStep('confirmed');
+    trackStageOnce('booking_confirmation', 'booking_confirmation_view', Object.assign(routeContext(bookingParams), { booking_reference: bookingCode, base_fare: Number(flight.price), ancillary_total: ancillaryValue(bookingParams), total_value: Number(flight.price) + ancillaryValue(bookingParams), booking_status: 'confirmed' }));
     setTimeout(function () {
       if (window.Notifications && window.Notifications.addMessage) {
         var to = params.to || 'KUL';
@@ -684,7 +712,11 @@
     };
     document.getElementById('new-search-btn').onclick = function () {
       resetBookingState();
+      paymentSubmitting = false;
+      viewedStages = { homepage: true };
+      currentBookingStep = null;
       showView('view-home');
+      if (window.BookingSteps && window.BookingSteps.setActiveStep) window.BookingSteps.setActiveStep('home');
     };
   }
 

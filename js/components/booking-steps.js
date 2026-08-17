@@ -8,14 +8,18 @@
     'step-search': 'search',
     'step-passenger': 'passenger',
     'step-ancillaries': 'baggage',
-    'step-review': 'review'
+    'step-review': 'review',
+    'step-payment': 'payment',
+    'step-confirmed': 'confirmed'
   };
   var pageById = {
     'step-home': 'home.html',
     'step-search': 'search_results.html',
     'step-passenger': 'booking-passenger.html',
     'step-ancillaries': 'booking-ancillaries.html',
-    'step-review': 'booking-review.html'
+    'step-review': 'booking-review.html',
+    'step-payment': 'booking-payment.html',
+    'step-confirmed': 'booking-complete.html'
   };
   var ACTIVE_CLASSES = ['active', 'bg-primary-100', 'text-primary-700'];
   var INACTIVE_CLASSES = ['text-gray-500'];
@@ -42,6 +46,7 @@
         setLinkActiveState(a, false);
         a.addEventListener('click', function(e) {
           e.preventDefault();
+          if (stepId === 'confirmed') return;
           if (stepId === 'home') window.showView('view-home');
           else if (stepId === 'search') window.showView('view-results');
           else if (stepId) window.showBookingStep(stepId);
